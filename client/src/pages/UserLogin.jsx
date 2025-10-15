@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 const UserLogin = () => {
@@ -17,6 +17,9 @@ const UserLogin = () => {
   const submitHandler = (e) =>{
     e.preventDefault()
     console.log(user)
+
+    let data = axios.post()
+    
     setUser({
     email: '',
     password: ''

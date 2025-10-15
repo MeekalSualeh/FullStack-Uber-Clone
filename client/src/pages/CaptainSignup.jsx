@@ -37,8 +37,10 @@ const CaptainSignup = () => {
 
   return (
     <div className='w-full min-h-screen flex flex-col px-5 py-3 font-[helvetica]'>
-      <div><img src="https://www.svgrepo.com/show/505031/uber-driver.svg" alt="uber-logo" 
-      className='w-18'/></div>
+      <div
+      ><img src="../src/assets/uber-driver-svgrepo-com.svg" 
+      className='w-20'/>
+      </div>
       <div>
         <form
         onSubmit={submitHandler}
