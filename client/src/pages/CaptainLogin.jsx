@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import ErrorComponent from '../components/ErrorComponent'
+import { captainLogin } from "../api/login.api"
 
 const CaptainLogin = () => {
 
@@ -9,18 +11,37 @@ const CaptainLogin = () => {
   })
 
   const [error, setError] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const navigate = useNavigate()
   
   const inputHandler = (e) =>{
     setUser({...user, [e.target.name]: e.target.value})
   }
 
-  const submitHandler = (e) =>{
+  const submitHandler = async (e) =>{
     e.preventDefault()
+    setIsSubmitting(true)
     console.log(user)
-    setUser({
-    email: '',
-    password: ''
-  })
+
+    try {
+      const response = await captainLogin(user)
+
+      setUser({
+      email: '',
+      password: ''
+      })
+
+      navigate("/captain-homepage")      
+
+    } catch (error) {
+      console.log(error)
+      setError(error.error || "Login Failed")
+
+    } finally{
+      setIsSubmitting(false)
+    }
+    
   }
 
   return (
@@ -62,9 +83,9 @@ const CaptainLogin = () => {
 
           <button
           type='submit'
-          disabled={!user.email || !user.password}
+          disabled={!user.email || !user.password || isSubmitting}
           className={`bg-orange-500 text-white font-semibold text-xl py-3 mt-6 rounded-sm outline-none focus:ring-2 focus:ring-blue-400 ${ (!user.email || !user.password) ? "cursor-not-allowed opacity-50": "cursor-pointer"}`}
-          > Login
+          > {isSubmitting? "Logging in..." : "Login"}
           </button>
 
         </form>

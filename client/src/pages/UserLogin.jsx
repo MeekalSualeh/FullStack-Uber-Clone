@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import ErrorComponent from '../components/ErrorComponent'
+import { userLogin } from "../api/login.api"
 
 const UserLogin = () => {
 
@@ -9,21 +11,37 @@ const UserLogin = () => {
   })
 
   const [error, setError] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const navigate = useNavigate()
 
   const inputHandler = (e) =>{
     setUser({...user, [e.target.name]: e.target.value})
   }
 
-  const submitHandler = (e) =>{
+  const submitHandler = async (e) =>{
     e.preventDefault()
+    setIsSubmitting(true)
     console.log(user)
 
-    let data = axios.post()
+    try {
+      const response = await userLogin(user)
+
+      setUser({
+      email: '',
+      password: ''
+      })
+
+      navigate("/user-homepage")      
+
+    } catch (error) {
+      console.log(error)
+      setError(error.error || "Login Failed")
+
+    } finally{
+      setIsSubmitting(false)
+    }
     
-    setUser({
-    email: '',
-    password: ''
-  })
   }
 
   return (
@@ -65,9 +83,9 @@ const UserLogin = () => {
 
           <button
           type='submit'
-          disabled={!user.email || !user.password}
+          disabled={!user.email || !user.password || isSubmitting}
           className={`bg-black text-white font-semibold text-xl py-3 mt-6 rounded-sm outline-none focus:ring-2 focus:ring-blue-400 ${ (!user.email || !user.password) ? "cursor-not-allowed opacity-50": "cursor-pointer"}`}
-          > Login
+          > {isSubmitting? "Logging in..." : "Login"}
           </button>
 
         </form>

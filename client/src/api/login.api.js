@@ -1,23 +1,26 @@
-const axios = require("axios")
+import { api } from "../config/axios.config"
 
-const userLogin = (credentials) =>{
-    const BASE_URL = import.meta.env.VITE_BACKEND_URL
-
-    try{
-        let data = axios.post(`${BASE_URL}/user/login`,credentials, {
-            withCredentials:true
-        })
-
-    } catch(error){
-
+const userLogin = async (credentials) =>{
+    try {
+        const response = await api.post("/user/login", credentials)
+        return response.data
+    
+    } catch (error) {
+        throw error.response?.data || error.message
     }
 }
 
-const userSignup = (credentials) =>{
-
+const captainLogin = async (credentials) =>{
+    try {
+        const response = await api.post("/captain/login", credentials)
+        return response.data
+    
+    } catch (error) {
+        throw error.response?.data || error.message
+    }
 }
 
-module.exports = {
+export {
     userLogin,
-    userSignup
+    captainLogin
 }

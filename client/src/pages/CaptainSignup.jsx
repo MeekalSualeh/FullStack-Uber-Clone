@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import ErrorComponent from '../components/ErrorComponent'
+import { captainSignup } from "../api/signup.api"
 
 const CaptainSignup = () => {
 
@@ -15,24 +17,42 @@ const CaptainSignup = () => {
   })
 
   const [error, setError] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const navigate = useNavigate()
   
   const inputHandler = (e) =>{
     setUser({...user, [e.target.name]: e.target.value})
   }
 
-  const submitHandler = (e) =>{
+  const submitHandler = async (e) =>{
     e.preventDefault()
+    setIsSubmitting(true)
     console.log(user)
-    setUser({
-    firstname: '',
-    lastname: '',
-    email: '',
-    password: '',
-    type: '',
-    color: '',
-    numberPlate: '',
-    capacity: ''
-  })
+
+    try {
+      const response = await captainSignup(user)
+
+      setUser({
+      firstname: '',
+      lastname: '',
+      email: '',
+      password: '',
+      type: '',
+      color: '',
+      numberPlate: '',
+      capacity: ''
+      })
+
+      navigate("/captain-homepage")      
+
+    } catch (error) {
+      console.log(error)
+      setError(error.error || "Signup Failed")
+
+    } finally{
+      setIsSubmitting(false)
+    } 
   }
 
   return (
@@ -169,9 +189,9 @@ const CaptainSignup = () => {
 
           <button
           type='submit'
-          disabled={!user.firstname || !user.lastname || !user.email || !user.password || !user.type || !user.color || !user.numberPlate || !user.capacity}
+          disabled={!user.firstname || !user.lastname || !user.email || !user.password || !user.type || !user.color || !user.numberPlate || !user.capacity || isSubmitting}
           className={`bg-orange-500 text-white font-semibold text-xl py-3 mt-6 rounded-sm outline-none focus:ring-2 focus:ring-blue-400 ${ (!user.firstname || !user.lastname || !user.email || !user.password || !user.type || !user.color || !user.numberPlate || !user.capacity) ? "cursor-not-allowed opacity-50": "cursor-pointer"}`}
-          > Create Account
+          > {isSubmitting? "Creating Account..." : "Create Account"}
           </button>
 
         </form>
