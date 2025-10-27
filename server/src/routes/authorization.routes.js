@@ -4,3 +4,5 @@ const { authenticateUser } = require("../middlewares/authenticationAndAuthorizat
 const { authorizeUserOrCaptain } = require("../controllers/authorization.controllers")
 
 router.get("/", authenticateUser, authorizeUserOrCaptain)
+
+module.exports = router
