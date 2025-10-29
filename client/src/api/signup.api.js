@@ -6,7 +6,7 @@ const userSignup = async (credentials) =>{
         return response.data
 
     } catch (error) {
-        throw error.response?.data || error.message
+        throw error.response?.data?.error || error.message
     }
 }
 
@@ -16,7 +16,7 @@ const captainSignup = async (credentials) =>{
         return response.data
 
     } catch (error) {
-        throw error.response?.data || error.message
+        throw error.response?.data?.error || error.message
     }
 }
 

@@ -3,7 +3,7 @@ import { fetchAuthData } from "../api/auth.api"
 
 const AuthContext = createContext()
 
-export const useAuth = () => useContext(AuthContext)
+export const useAuthContext = () => useContext(AuthContext)
 
 const AuthContextProvider = ({ children }) => {
   const [isLoggedin, setIsLoggedin] = useState(false);
@@ -19,7 +19,12 @@ const AuthContextProvider = ({ children }) => {
         if(response.role){
           setRole(response.role);
           setIsLoggedin(true);
-        }  
+        } 
+        else{
+          setRole(null);
+          setIsLoggedin(false);
+
+        }
   
       } catch (error) {
         setRole(null);

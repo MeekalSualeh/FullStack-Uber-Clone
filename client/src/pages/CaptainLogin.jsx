@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import ErrorComponent from '../components/ErrorComponent'
 import { captainLogin } from "../api/login.api"
+import { useAuthContext } from "../contexts/AuthContextProvider"
 
 const CaptainLogin = () => {
 
@@ -14,7 +15,16 @@ const CaptainLogin = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const navigate = useNavigate()
+  const authData = useAuthContext();
   
+  if(authData.isLoading){
+    return <div>Loading...</div>
+  }
+
+  if(authData.isLoggedin){
+    return <Navigate to="/captain-homepage" replace/>
+  }
+
   const inputHandler = (e) =>{
     setUser({...user, [e.target.name]: e.target.value})
   }
@@ -32,11 +42,17 @@ const CaptainLogin = () => {
       password: ''
       })
 
-      navigate("/captain-homepage")      
+      authData.setIsLoggedin(true);
+      authData.setRole("captain");
+
+      // navigate("/captain-homepage")      
+      setTimeout(() =>{
+        navigate("/captain-homepage")
+      }, 0)
 
     } catch (error) {
       console.log(error)
-      setError(error.error || "Login Failed")
+      setError(error || "Login Failed")
 
     } finally{
       setIsSubmitting(false)
@@ -84,7 +100,7 @@ const CaptainLogin = () => {
           <button
           type='submit'
           disabled={!user.email || !user.password || isSubmitting}
-          className={`bg-orange-500 text-white font-semibold text-xl py-3 mt-6 rounded-sm outline-none focus:ring-2 focus:ring-blue-400 ${ (!user.email || !user.password) ? "cursor-not-allowed opacity-50": "cursor-pointer"}`}
+          className={`bg-orange-500 text-white font-semibold text-xl py-3 mt-6 rounded-sm outline-none focus:ring-2 focus:ring-blue-400 ${ (!user.email || !user.password || isSubmitting) ? "cursor-not-allowed opacity-50": "cursor-pointer"}`}
           > {isSubmitting? "Logging in..." : "Login"}
           </button>
 
