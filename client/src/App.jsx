@@ -9,6 +9,8 @@ import UserHomepage from './pages/UserHomepage'
 import CaptainHomepage from './pages/CaptainHomepage'
 import ProtectedRoute from './pages/ProtectedRoute'
 import AuthorizedRoute from './pages/AuthorizedRoute'
+import UserLogout from './pages/UserLogout'
+import CaptainLogout from './pages/CaptainLogout'
 
 
 const App = () => {
@@ -27,11 +29,13 @@ const App = () => {
           {/* Captain Only Routes */}
           <Route element={ <AuthorizedRoute roles={["captain"]} /> } >
             <Route path="/captain-homepage" element={ <CaptainHomepage />} ></Route>
+            <Route path="/captain-logout" element={ <CaptainLogout />} ></Route>
           </Route>
 
           {/* User Only Routes */}
           <Route element={ <AuthorizedRoute roles={["user"]} /> } >
             <Route path="/user-homepage" element={ <UserHomepage />} ></Route>
+            <Route path="/user-logout" element={ <UserLogout />} ></Route>
           </Route>
 
         </Route>
