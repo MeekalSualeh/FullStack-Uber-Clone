@@ -13,8 +13,11 @@ const { mapRateLimiter } = require("../services/rateLimiter.services")
 
 router.use(mapRateLimiter)
 
-router.get("/get-suggestions", authenticateUser, authorizeUserContainer(["USER"]), query("input").isString().isLength({ min:3 }).withMessage("suggestion field must be atleast 3 characters long"), 
-handleGettingSuggestions)
+router.get("/get-suggestions",
+    authenticateUser,
+    authorizeUserContainer(["USER"]),
+    query("input").isString().isLength({ min:3 }).withMessage("suggestion field must be atleast 3 characters long"), 
+    handleGettingSuggestions)
 
 router.get("/get-coordinates",
     authenticateUser,
