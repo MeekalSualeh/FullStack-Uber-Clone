@@ -1,14 +1,15 @@
-const axios = require("axios")
+import { api } from "../config/axios.config"
 
-const userLogin = (credentials) =>{
-
+const createRide = async (data) =>{
+    try {
+        const response = await api.post("/user/login", data)
+        return response.data
+    
+    } catch (error) {
+        throw error.response?.data?.error || error.message
+    }
 }
 
-const userSignup = (credentials) =>{
-
-}
-
-module.exports = {
-    userLogin,
-    userSignup
+export {
+    createRide,
 }

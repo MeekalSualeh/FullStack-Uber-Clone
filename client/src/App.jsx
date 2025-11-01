@@ -24,21 +24,21 @@ const App = () => {
         <Route path="/captain-signup" element={ <CaptainSignup />} ></Route>
 
         {/* Protected Routes */}
-        <Route element={ <ProtectedRoute /> } > 
+        {/* <Route element={ <ProtectedRoute /> } >  */}
 
           {/* Captain Only Routes */}
-          <Route element={ <AuthorizedRoute roles={["captain"]} /> } >
+          {/* <Route element={ <AuthorizedRoute roles={["captain"]} /> } > */}
             <Route path="/captain-homepage" element={ <CaptainHomepage />} ></Route>
             <Route path="/captain-logout" element={ <CaptainLogout />} ></Route>
-          </Route>
+          {/* </Route> */}
 
           {/* User Only Routes */}
-          <Route element={ <AuthorizedRoute roles={["user"]} /> } >
+          {/* <Route element={ <AuthorizedRoute roles={["user"]} /> } > */}
             <Route path="/user-homepage" element={ <UserHomepage />} ></Route>
             <Route path="/user-logout" element={ <UserLogout />} ></Route>
-          </Route>
+          {/* </Route> */}
 
-        </Route>
+        {/* </Route> */}
       </Routes>
       
     </div>
