@@ -7,7 +7,7 @@ const Suggestions = ({onClick, suggestions, isSuggestionsLoading}) => {
     className='overflow-y-auto no-scrollbar flex flex-col items-center gap-y-3 h-80 mt-4 font-[helvetica]'>
       
         {isSuggestionsLoading && (
-          <div className='text-2xl tracking-tight'
+          <div className='text-2xl tracking-tight text-slate-800'
           >Loading Suggestions...</div>
         )}
 

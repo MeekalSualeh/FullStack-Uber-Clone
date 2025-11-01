@@ -1,26 +1,53 @@
-import React from 'react'
+import { RiUser3Fill } from "@remixicon/react"
 
-const VehicleType = ({imgSrc, vehicleType, tagLine, fare, capacity}) => {
+const VehicleType = ({
+    imgSrc, 
+    vehicleType, 
+    vehicleName, 
+    tagLine, 
+    fare, 
+    capacity, 
+    onClick, 
+    isFocused, 
+    imgCover = false }) => {
   return (
-    <div className='bg-gray-200 focus:ring-2 focus:ring-black flex'>
-        <div>
-            <img src="" alt="" />
+    <div 
+    className={`${isFocused ? "ring-3 ring-black" : ""} flex mx-2 py-3 font-[helvetica] items-center rounded-xl bg-gray-100`}
+    onClick={() =>{
+        onClick(vehicleType)
+    }}>
+
+        <div className="w-[28%] flex items-center h-full">
+            <img src={imgSrc} 
+            alt="Vehicle image" 
+            className={`${imgCover ? "object-cover" : "object-contain"} w-full h-full`}
+            />
         </div>
-        <div></div>
-        <div></div>
+
+        <div className="flex flex-col w-6/12 gap-y-1">
+            <h1 className="text-lg font-semibold text-black bg-blend-screen items-center">
+                {vehicleName}
+            </h1>
+
+            <h2 className="text-slate-700 text-sm">
+                {tagLine}
+            </h2>
+
+            <div className="gap-x-1 flex items-center">
+                <RiUser3Fill height="1em" widths="1em" color="#000" />
+                {capacity}
+            </div>
+        </div>
+
+        <div className="w-3/13 h-full">
+        <h1 className={`${fare < 10000? "text-lg" : "text-md"} h-10 text-black font-semibold flex items-center gap-x-1`}>
+            <p className="text-xs">PKR</p>
+            {fare}
+        </h1>
+        </div>
+
     </div>
   )
 }
 
 export default VehicleType
-
-
-// https://www.acev.co.nz/uber-green
-
-// data:image/jpeg;base64,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
-
-// https://www.uber.com/in/en/ride/uber-auto/
-
-// https://www.uber.com/in/en/ride/uber-moto/
-
-// https://kjtbestov.click/product_details/33743037.html

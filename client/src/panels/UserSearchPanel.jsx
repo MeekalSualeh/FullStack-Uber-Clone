@@ -33,7 +33,7 @@ const UserSearchPanel = ({pickup, destination, setPickup, setDestination, search
 
   useEffect(() =>{
 
-    if(input.length > 1000){
+    if(input.length > 1000){ // 1000 ki jagah 3 krna h
       setIsSuggestionsLoading(true)
       
       const delay = setTimeout(() =>{

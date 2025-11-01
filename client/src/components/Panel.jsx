@@ -9,7 +9,8 @@ const Panel = ({
   isMinimized = false,
   minimizedY = "63%",
   heading,
-  onPanelClose,
+  onPanelClose = false,
+  defaultY = "100%",
   children }) => {
 
   const panelRef = useRef(null)
@@ -48,7 +49,8 @@ const Panel = ({
   return (
     <div
       ref={panelRef} 
-      className='h-full flex flex-col w-screen absolute bottom-0 bg-white rounded-t-4xl transform translate-y-[100%]'>
+      className='h-full flex flex-col w-screen absolute bottom-0 bg-white rounded-t-4xl transform'
+      style={{transform: `translateY(${defaultY})`}}>
 
         <div
         className='flex justify-between mx-7 mt-6'>
@@ -56,7 +58,7 @@ const Panel = ({
           <h1 className='h-fit text-2xl text-slate-800 font-bold'
           >{heading}</h1>
 
-          {isActive && <PanelCloser
+          {(isActive && onPanelClose) && <PanelCloser
           size="text-lg"
           color="bg-gray-100"
           onClick={onPanelClose}/>

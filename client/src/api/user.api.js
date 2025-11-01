@@ -36,7 +36,10 @@ const getDistanceTime = async (origins, destinations) =>{
                 destinations
             }
         })
-        return response.data
+        return {
+            distance: response.data.distance.value,
+            time: response.data.duration.value
+        }
         
     } catch (error) {
         throw error.response?.data?.error || error.message
@@ -55,12 +58,34 @@ const getFares = async (distance, time) =>{
     
     } catch (error) {
         throw error.response?.data?.error || error.message
-    }s
+    }
 }
+
+const getDistanceTimeAndFare = async (origins, destinations) =>{
+    try {
+        const distanceAndTimeResponse = await getDistanceTime(origins, destinations)
+        const { distance, time } = distanceAndTimeResponse
+
+        const fareResponse = await getFares(distance, time)
+        
+        return {
+            distance, 
+            time, 
+            fares: fareResponse
+        }
+
+    } catch (error) {
+        throw error.response?.data?.error || error.message
+    }
+    
+}
+
+
 
 export {
     getSuggestions,
     getCoordinates,
     getFares,
-    getDistanceTime
+    getDistanceTime,
+    getDistanceTimeAndFare
 }
