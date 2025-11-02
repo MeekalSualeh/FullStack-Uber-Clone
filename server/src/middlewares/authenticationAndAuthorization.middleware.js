@@ -223,11 +223,11 @@ const socketAuthMiddleware = async (socket, next) =>{
             anotherPerson.role = anotherPersonRole;
             socket.anotherPersonId = anotherPersonId;
             
-            socket.emit("initial-data", { user, ride: rideWithoutChat, chat, anotherPerson })            
+            socket.emit("initial-data", { user, onRide:true, ride: rideWithoutChat, chat, anotherPerson })            
             return next()
         }
         
-        socket.emit("initial-data", { user })
+        socket.emit("initial-data", { user, onRide: false })
         return next();
         
     } catch (error) {
