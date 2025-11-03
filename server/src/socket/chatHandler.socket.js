@@ -6,27 +6,27 @@ module.exports = (io, socket) =>{
     socket.removeAllListeners("give-chats")
     socket.removeAllListeners("message-from-frontend")
 
-    socket.on("join-chatroom", async (rideId) =>{
+    socket.on("join-chatroom", async ({rideId}) =>{
 
-        const chat = await chatModel.findOne({ ride: rideId })
+        const chats = await chatModel.findOne({ ride: rideId })
 
-        if(!chat){
-            return socket.emit("error", "Unauthorized Chat Room ID")
+        if(!chats){
+            return socket.emit("error", {error: "Unauthorized Chat Room ID"})
         }
         
         socket.join(rideId.toString())
-        return socket.emit("chats", chat)
+        return socket.emit("chats", {chats})
     })
 
-    socket.on("give-chats", async (rideId) =>{
+    socket.on("give-chats", async ({rideId}) =>{
 
-        const chat = await chatModel.findOne({ ride: rideId }) 
+        const chats = await chatModel.findOne({ ride: rideId }) 
 
-        if(!chat){
+        if(!chats){
             return new Error("Unauthorized Chat Room ID")
         }
         
-        return socket.emit("chats", chat)
+        return socket.emit("chats", {chats})
     })
 
 
@@ -35,7 +35,7 @@ module.exports = (io, socket) =>{
             const chat = await chatModel.findOne({ ride: rideId })
 
             if(!chat){
-                return socket.emit("error", "Unauthorized Chat Room ID")
+                return socket.emit("error", {error: "Unauthorized Chat Room ID"})
             }
 
             const message = await messageModel.create({
@@ -46,17 +46,17 @@ module.exports = (io, socket) =>{
             })
     
             if(!message){
-                return socket.emit("error", "Couldn't send message")
+                return socket.emit("error", {error: "Couldn't send message"})
             }
 
             chat.messages.push(message._id)
             await chat.save()
 
-            return io.to(rideId.toString()).emit("message-from-backend", message)
+            return io.to(rideId.toString()).emit("message-from-backend", {message})
 
         } catch (error) {
             console.log(error)
-            socket.emit("error", error.message)
+            socket.emit("error", {error: error.message})
         }
     })
 }

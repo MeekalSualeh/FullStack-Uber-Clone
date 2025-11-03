@@ -18,27 +18,27 @@ module.exports = (io, socket) =>{
             await captainModel.findByIdAndUpdate(socket.userId, { "location.coordinates": coordinates })
 
             if(rideId){
-                socket.to(socket.rideId.toString()).emit("update-location", coordinates)
+                socket.to(socket.rideId.toString()).emit("update-location", {coordinates})
             }
 
         } catch (error) {
             console.log(error)
-            return socket.emit("error", error.message)
+            return socket.emit("error", { error:error.message })
         }
     })
     
-    socket.on("accept-ride", async (rideId) =>{
+    socket.on("accept-ride", async ({rideId}) =>{
         try {
             const ride = await rideModel.findOneAndUpdate({ _id: rideId, status:"waiting" }, {captain: socket.userId, status: "accepted"}, {new : true})
 
             if(!ride){
-                return socket.emit("error", "Ride Request does not exist")
+                return socket.emit("error", {error: "Ride Request does not exist"})
             }
 
             const captain = await captainModel.findByIdAndUpdate(socket.userId, {$push: { rides: rideId }, status: "on-ride"}, { new: true })
 
             if(!captain){
-                return socket.emit("error", "couldn't accept ride, Captain not found ")
+                return socket.emit("error", {error: "couldn't accept ride, Captain not found "})
             }
 
             ride.vehicle = captain.vehicle
@@ -49,7 +49,7 @@ module.exports = (io, socket) =>{
             const user = await userModel.findByIdAndUpdate(ride.user, { status: "on-ride" }, { new: true })
 
             if(!user){
-                return socket.emit("error", "couldn't accept ride, User not found ")
+                return socket.emit("error", {error: "couldn't accept ride, User not found "})
             }
 
             const room = rideId.toString()
@@ -67,7 +67,7 @@ module.exports = (io, socket) =>{
             socket.rideId = room
             
             // baki captains se ride remove krna
-            io.in(room).except(socket.id).emit("remove-ride", rideId);
+            io.in(room).except(socket.id).emit("remove-ride", {rideId});
             io.in(room).except(socket.id).socketsLeave();
             io.sockets.sockets.get(userSocketId)?.join(room)
             
@@ -76,40 +76,40 @@ module.exports = (io, socket) =>{
 
         } catch (error) {
             console.log(error)
-            socket.emit("error", error.message)
+            socket.emit("error", { error:error.message })
         }
     })
     
-    socket.on("remove-ride", (rideId) =>{
+    socket.on("remove-ride", ({rideId}) =>{
         socket.leave(rideId.toString())
-        socket.emit("remove-ride", rideId)
+        socket.emit("remove-ride", {rideId})
     })
     
-    socket.on("cancelled-by-captain", async (rideId) =>{
+    socket.on("cancelled-by-captain", async ({rideId}) =>{
         try {
 
             const ride = await rideModel.findByIdAndUpdate(rideId, { status: "cancelled-by-captain" }, { new: true })
 
             if(!ride){
-                return socket.emit("error", "couldn't cancel ride, ride not found")
+                return socket.emit("error", {error: "couldn't cancel ride, ride not found"})
             }
             
             const captain = await captainModel.findByIdAndUpdate(socket.userId, { status: "online" }, {new: true})
             
             if(!captain){
-                return socket.emit("error", "couldn't cancel ride, Captain not found ")
+                return socket.emit("error", {error: "couldn't cancel ride, Captain not found "})
             }
 
             const user = await userModel.findByIdAndUpdate(ride.user, { status: "online" }, { new: true })
 
             if(!user){
-                return socket.emit("error", "couldn't cancel ride, User not found")
+                return socket.emit("error", {error: "couldn't cancel ride, User not found"})
             }
 
             const room = rideId.toString()
             delete socket.rideId
 
-            io.to(room).emit("cancelled-by-captain")
+            io.to(room).emit("cancelled-by-captain", {rideId: room})
             io.socketsLeave(room)
 
             cache.del(`ride:${rideId.toString()}`)
@@ -118,50 +118,51 @@ module.exports = (io, socket) =>{
 
         } catch (error) {
             console.log(error)
-            return socket.emit("error", error.message)
+            return socket.emit("error", { error:error.message })
         }
     })
 
-    socket.on("ride-started", async (rideId) =>{
+    socket.on("ride-started", async ({rideId}) =>{
         try {
             const ride = await rideModel.findByIdAndUpdate(rideId, { status: "on-the-way" }, { new: true })
 
             if(!ride){
-                return socket.emit("error", "Cannot start ride, ride not found")
+                return socket.emit("error", {error: "Cannot start ride, ride not found"})
             }
 
-            cache.set(`ride:${rideId.toString()}`, ride.toObject())
-            io.to(rideId.toString()).emit("ride-started")
+            rideId = rideId.toString()
+            cache.set(`ride:${rideId}`, ride.toObject())
+            io.to(rideId.toString()).emit("ride-started", {rideId})
 
         } catch (error) {
             console.log(error)
-            socket.emit("error", error.message)
+            socket.emit("error", { error:error.message })
         }
     })
 
-    socket.on("ride-completed", async (rideId) =>{
+    socket.on("ride-completed", async ({rideId}) =>{
         try {
             const ride = await rideModel.findByIdAndUpdate(rideId, {status: "completed"}, { new: true})
 
             if(!ride){
-                return socket.emit("error", "Cannot complete ride, ride not found")
+                return socket.emit("error", {error: "Cannot complete ride, ride not found"})
             }
 
             const captain = await captainModel.findByIdAndUpdate(socket.userId, {status: "online"}, { new: true})
 
             if(!captain){
-                return socket.emit("error", "Cannot complete ride, captain not found")
+                return socket.emit("error", {error: "Cannot complete ride, captain not found"})
             }
 
             const user = await userModel.findByIdAndUpdate(ride.user, {status: "online"}, { new: true})
 
             if(!user){
-                return socket.emit("error", "Cannot complete ride, user not found")
+                return socket.emit("error", {error: "Cannot complete ride, user not found"})
             }
 
             const room = rideId.toString();
 
-            io.to(room).emit("ride-completed")
+            io.to(room).emit("ride-completed", {rideId: room})
             io.socketsLeave(room.toString())
             delete socket.rideId;
 
@@ -171,7 +172,7 @@ module.exports = (io, socket) =>{
 
         } catch (error) {
             console.log(error)
-            socket.emit("error", error.message)
+            socket.emit("error", { error:error.message })
         }
     })
 }

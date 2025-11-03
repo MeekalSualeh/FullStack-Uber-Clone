@@ -6,46 +6,61 @@ const cache = require("../services/cache.services")
 module.exports = (io, socket) =>{
     socket.removeAllListeners("cancelled-by-user")
         
-    socket.on("cancelled-by-user", async (rideId) =>{
+    socket.on("cancelled-by-user", async ({rideId}) =>{
         try {
 
             const ride = await rideModel.findByIdAndUpdate(rideId, { status: "cancelled-by-user" }, { new: true})
 
             if(!ride){
-                return socket.emit("error", "couldn't cancel ride, ride not found")
+                return socket.emit("error", {error: "couldn't cancel ride, ride not found"})
             }
             
-            const captain = await captainModel.findByIdAndUpdate(ride.captain, { status: "online" }, { new: true })
+            const user = await userModel.findById(socket.userId)
             
-            if(!captain){
-                return socket.emit("error", "couldn't cancel ride, captain not found")
-            }
-
-            const user = await userModel.findByIdAndUpdate(socket.userId, { status: "online" }, { new: true})
-
             if(!user){
-                return socket.emit("error", "couldn't cancel ride, user not found")
+                return socket.emit("error", {error: "couldn't cancel ride, user not found"})
             }
+
+            const userStatus = user.status;
+            user.status = "online"
+            await user.save()
 
             const room = rideId.toString()
-            io.to(room).emit("cancelled-by-user")
+
+            if(userStatus === "finding-driver"){
+
+                const rideTimeout = cache.get(`rideTimeout:${room}`)
+                if(rideTimeout){
+                    clearTimeout(rideTimeout)
+                    cache.del(`rideTimeout:${room}`)
+                }
+                
+                io.to(room).emit("remove-ride", {rideId: room})
+                socket.emit("remove-ride", {rideId: room})
+            }
+
+            else {
+                const captain = await captainModel.findByIdAndUpdate(ride.captain, { status: "online" }, { new: true })
+                
+                if(!captain){
+                    return socket.emit("error", {error: "couldn't cancel ride, captain not found"})
+                }
+
+                io.to(room).emit("cancelled-by-user", {rideId: room})
+
+                cache.del(`ride:${rideId.toString()}`);
+                cache.set(`user:${captain._id.toString()}`, captain.toObject());
+            }
+            
             io.socketsLeave(room)
             delete socket.rideId
 
-            const rideTimeout = cache.get(`rideTimeout:${room}`)
-            if(rideTimeout){
-                clearTimeout(rideTimeout)
-                cache.del(`rideTimeout:${room}`)
-            }
-
-            cache.del(`ride:${rideId.toString()}`);
             cache.set(`user:${user._id.toString()}`, user.toObject());
-            cache.set(`user:${captain._id.toString()}`, captain.toObject());
 
 
         } catch (error) {
             console.log(error)
-            return socket.emit("error", error.message)
+            return socket.emit("error", {error: error.message})
         }
     })
 }

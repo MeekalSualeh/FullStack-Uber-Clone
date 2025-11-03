@@ -26,7 +26,7 @@ module.exports = (io, socket) =>{
                 }
                 rideId = rideId.toString()
 
-                socket.to(rideId).emit("remove-ride", rideId)
+                socket.to(rideId).emit("remove-ride", {rideId})
                 io.socketsLeave(rideId);
 
                 const rideTimeout = cache.get(`rideTimeout:${rideId}`)

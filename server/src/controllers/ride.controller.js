@@ -21,7 +21,7 @@ const handleCreatingRide = async (req, res) =>{
         const existingRide = await rideModel.findOne({ user: userId, status: { $in: ["waiting", "accepted", "on-the-way"] } }).lean()
 
         if(existingRide){
-            return res.status(400).json({ error: "User is already finding driver" })
+            return res.status(400).json({ error: "User is already finding driver / on ride" })
         }
 
         const ride = await rideModel.create({
@@ -83,15 +83,15 @@ const handleCreatingRide = async (req, res) =>{
                     const user = await userModel.findByIdAndUpdate(userId, { status: "online" })
                     
                     if(user.matchedCount === 0){
-                        return io.to(userSocketId).emit("error", "No User found in Ride timeout")
+                        return io.to(userSocketId).emit("error", {error: "No User found in Ride timeout"})
                     }
 
-                    io.to(room).emit("remove-ride", timedOutRide._id)
-                    io.to(userSocketId).emit("ride-timeout", timedOutRide._id)
+                    io.to(room).emit("remove-ride", {rideId: timedOutRide._id})
+                    io.to(userSocketId).emit("ride-timeout", {rideId: timedOutRide._id})
 
                 } catch (error) {
                     console.log(error)
-                    return io.to(room).emit("error", error.message)
+                    return io.to(room).emit("error", {error: error.message})
                 }
         }, 60000)
 
