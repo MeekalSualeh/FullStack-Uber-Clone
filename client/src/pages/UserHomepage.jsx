@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Logout from "../components/Logout"
 import Panel from "../components/Panel"
 import UserSearchPanel from '../panels/UserSearchPanel'
@@ -14,9 +14,22 @@ const UserHomepage = () => {
 
   const [pickup, setPickup] = useState("")
   const [destination, setDestination] = useState("")
+  const [mainAndSecondaryText, setMainAndSecondaryText] = useState({
+    pickup:{
+      mainText: "UBIT",
+      secondaryText: "Circular Road, University Of Karachi"
+    },
+    destination:{
+      mainText: "Maalik Welfare Organization",
+      secondaryText: "F.B Area, Gulberg Block-12, Karachi, Pakistan"
+    }
+  }) // hardcoded h ise null krna
   const [focusedOn, setFocusedOn] = useState("")
+
   const [vehicleType, setVehicleType] = useState("")
-  const [fare, setFare] = useState(null)
+  const [fare, setFare] = useState(0) // hardcoded h ise null krna
+  const [time, setTime] = useState(1340) // hardcoded h ise null krna
+  const [distance, setDistance] = useState(12324) // hardcoded h ise null krna
 
   const [activePanel, setActivePanel] = useState("minimizedSearch")
 
@@ -31,6 +44,7 @@ const UserHomepage = () => {
 
   const [isRideGettingCancelled, setIsRideGettingCancelled] = useState(false)
   // const panelArray = useRef(["minimizedSearch", "search", "vehicle", "findingDriver", "rideTimedOut", "rideCancelledByUser",  "waitingForDriver", "minimizedWaitingForDriver", "onTheRide", "minimizedOnTheRide", "rideCompleted"])
+  const logoutRef = useRef(null)
 
   const cancelRide = async () =>{
     
@@ -53,13 +67,14 @@ const UserHomepage = () => {
         alt="Uber-logo" 
         className='w-18 h-fit'/>
         
-        <Logout />
+        <Logout ref={logoutRef} />
       </div>
 
       <div className='h-112'>
         <img src="https://miro.medium.com/v2/resize:fit:720/format:webp/0*gwMx05pqII5hbfmX.gif" alt="uber-map" 
         className='h-full'/>
       </div>
+
 
       {/* Search Panel */}
       {(isSearchPanelInView && (
@@ -81,6 +96,8 @@ const UserHomepage = () => {
           destination={destination}
           setPickup={setPickup}
           setDestination={setDestination}
+          mainAndSecondaryText={mainAndSecondaryText}
+          setMainAndSecondaryText={setMainAndSecondaryText}
           focusedOn={focusedOn}
           searchPanelClickHandler={(e) =>{
             setActivePanel("search")
@@ -95,6 +112,7 @@ const UserHomepage = () => {
 
         </Panel>
       ))}
+
 
       {/* Vehicle Panel */}
       {(isVehiclePanelInView && (
@@ -111,10 +129,15 @@ const UserHomepage = () => {
         }}>
 
         <UserVehiclePanel
-        vehicle={vehicleType}
-        setVehicle={setVehicleType}
+        vehicleType={vehicleType}
+        setVehicleType={setVehicleType}
         pickup={pickup}
         destination={destination}
+        setFare={setFare}
+        time={time}
+        setTime={setTime}
+        distance={distance}
+        setDistance={setDistance}
         submitButtonHandler={() =>{
           setIsFindingDriverPanelInView(true)
           setActivePanel("findingDriver")
@@ -124,17 +147,23 @@ const UserHomepage = () => {
         </Panel>
       ))}
 
+
       {/* Finding Driver Panel */}
       {(isFindingDriverPanelInView && (
         <Panel 
-        isActive={activePanel === "findingDriver"}  
-        heading="Finding Driver..."
+        isActive={activePanel === "findingDriver"}
+        heading="Finding Driver"
         onInActive={() =>{
           setIsFindingDriverPanelInView(false)
         }}
         >
 
         <UserFindingDriverPanel
+        vehicleType={vehicleType}
+        mainAndSecondaryText={mainAndSecondaryText}
+        time={time}
+        distance={distance}
+        fare={fare}
         onCancelTheRide={() =>{
           setIsVehiclePanelInView(true)
           setActivePanel("vehicle")

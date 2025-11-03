@@ -4,7 +4,17 @@ import PanelButton from "../components/PanelButton"
 import SearchField from "../components/SearchField"
 import Suggestions from "../components/Suggestions"
 
-const UserSearchPanel = ({pickup, destination, setPickup, setDestination, searchPanelClickHandler, submitButtonHandler, focusedOn}) => {
+const UserSearchPanel = ({
+  pickup, 
+  destination, 
+  setPickup, 
+  setDestination,
+  mainAndSecondaryText,
+  setMainAndSecondaryText,
+  searchPanelClickHandler, 
+  submitButtonHandler, 
+  focusedOn
+}) => {
 
   const [suggestions, setSuggestions] = useState([])
   const [isSuggestionsLoading, setIsSuggestionsLoading] = useState(false)
@@ -14,9 +24,13 @@ const UserSearchPanel = ({pickup, destination, setPickup, setDestination, search
     try {
       const response = await getSuggestions(input)
       const suggestionsData = response.map((suggestion) =>{
+        const { description, place_id, structured_formatting } = suggestions
+        
         return {
-          description: suggestion.description,
-          place_id: suggestion.place_id
+          description: description,
+          placeId: place_id,
+          mainText: structured_formatting.main_text,
+          secondaryText: structured_formatting.secondary_text
         }
       })
       console.log(suggestionsData)
@@ -83,12 +97,14 @@ const UserSearchPanel = ({pickup, destination, setPickup, setDestination, search
         <Suggestions
           suggestions={suggestions}
           isSuggestionsLoading={isSuggestionsLoading}
-          onClick={(description) =>{
+          onClick={(suggestion) =>{
             if(focusedOn === "pickup"){
-              setPickup(description)
+              setPickup(suggestion.description)
+              setMainAndSecondaryText((prev) => ({...prev, pickup: suggestion}))
 
             } else if(focusedOn === "destination"){
-              setDestination(description)
+              setDestination(suggestion.description)
+              setMainAndSecondaryText((prev) => ({...prev, destination: suggestion}))
             }
           }}        
         />

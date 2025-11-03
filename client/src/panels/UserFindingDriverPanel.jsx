@@ -1,64 +1,90 @@
 import { useCallback, useEffect, useState } from "react"
 import PanelButton from "../components/PanelButton"
-import VehicleType from "../components/VehicleType"
+import AnimatedTitlePing from "../components/AnimatedTitlePing"
+import AnimatedVehicle from "../components/AnimatedVehicle"
+import carImg from "/car.png"
+import motoImg from "/moto.webp"
+import autoImg from "/auto.webp"
+import SingleInfo from "../components/SingleInfo"
+import { RiMapPin2Fill, RiWalletFill } from "@remixicon/react"
+import { useUserContext } from "../contexts/UserContextProvider"
+import { useCaptainContext } from "../contexts/CaptainContextProvider"
+import { useRideContext } from "../contexts/RideContextProvider"
+import { useChatContext } from "../contexts/ChatContextProvider"
 
-const UserFindingDriverPanel = ({vehicle, setVehicle, submitButtonHandler}) => {
+
+const UserFindingDriverPanel = ({
+    onCancelTheRide, 
+    vehicleType, 
+    mainAndSecondaryText,
+    fare,
+    time,
+    distance
+}) => {
 
   const [isLoading, setIsLoading] = useState(false)
 
-  const onClick = (vehicleType) =>{
-    setVehicle(vehicleType)
-  }
+  const userData = useUserContext()
+  const captainData = useCaptainContext()
+  const rideData = useRideContext()
+  const chatData = useChatContext()
 
-  if(isLoading){
-    return <div className="text-xl text-slate-800">Loading Vehicles & Fares</div> 
+  const tempSubmitHandler = () =>{ //delete this and all Contexts and put onCancelTheRide in button
+    console.log(userData)
+    console.log(captainData)
+    console.log(rideData)
+    console.log(chatData)
+
+    onCancelTheRide()
   }
 
   return (
     <>
-        <div className="flex flex-col gap-y-5 w-full mt-8">
-            
-          <VehicleType 
-          imgSrc="https://cn-geo1.uber.com/image-proc/crop/resizecrop/udam/format=auto/width=341/height=192/srcb64=aHR0cHM6Ly90Yi1zdGF0aWMudWJlci5jb20vcHJvZC91ZGFtLWFzc2V0cy9hZmE5NzhjMi1kM2RlLTRiNmItYTgwZS0wMDFlZjA1MzcwZmYuanBn"
-          vehicleName="Uber Premier"
-          vehicleType="car"
-          tagLine="Affordable, Car Rides"
-          fare={3000}
-          capacity={4}
-          isFocused={vehicle === "car"}
-          onClick={onClick}
-          />
+        <div className="flex flex-col w-[85%] mt-5 mx-auto items-center">
 
-          <VehicleType 
-          imgSrc="https://cn-geo1.uber.com/image-proc/crop/resizecrop/udam/format=auto/width=576/height=384/srcb64=aHR0cHM6Ly90Yi1zdGF0aWMudWJlci5jb20vcHJvZC91ZGFtLWFzc2V0cy9hMjU1M2ExOC0yZjc3LTQ3MjItYTRiYS1mNzM2ZjRjYjQwNWUucG5n"
-          vehicleName="Uber Moto"
-          vehicleType="moto"
-          tagLine="Affordable, Motor Rides"
-          fare={100}
-          capacity={1}
-          isFocused={vehicle === "moto"}
-          onClick={onClick}
-          />
+            <AnimatedVehicle 
+            imgSrc={vehicleType === "car" ? carImg : vehicleType === "moto" ? motoImg : autoImg}
+            mtClass="mt-7 mb-4"
+            imgCover={vehicleType === "car"}
+            />
 
-          <VehicleType 
-          imgSrc="https://cn-geo1.uber.com/image-proc/crop/resizecrop/udam/format=auto/width=576/height=384/srcb64=aHR0cHM6Ly90Yi1zdGF0aWMudWJlci5jb20vcHJvZC91ZGFtLWFzc2V0cy8xZGRiOGM1Ni0wMjA0LTRjZTQtODFjZS01NmExMWEwN2ZlOTgucG5n"
-          vehicleName="Uber Auto"
-          vehicleType="auto"
-          tagLine="Affordable, Auto Rides"
-          fare={200}
-          capacity={3}
-          isFocused={vehicle === "auto"}
-          onClick={onClick}
-          />
+            <AnimatedTitlePing 
+            steadyColor={isLoading ? "bg-orange-400" : "bg-green-400"}
+            blinkingColor={isLoading ? "bg-orange-400" : "bg-green-400"}
+            title="Looking For Nearby Drivers..."/>
 
+            {isLoading && <div className="text-xl font-semibold text-slate-800 mt-10"> Creating Ride...</div>}
+
+            {!isLoading && (
+                <div className="mt-5 flex flex-col gap-y-4">
+
+                    <SingleInfo
+                    title={mainAndSecondaryText.pickup.mainText}
+                    content={mainAndSecondaryText.pickup.secondaryText}
+                    IconComponent={RiMapPin2Fill}
+                    />
+
+                    <SingleInfo
+                    title={mainAndSecondaryText.destination.mainText}
+                    content={mainAndSecondaryText.destination.secondaryText}
+                    IconComponent={RiMapPin2Fill}
+                    />
+
+                    <SingleInfo
+                    title={`PKR ${450}`}
+                    content={`Time To Reach: ${Math.ceil(time/60)} mins, Distance: ${Math.ceil(distance/1000)} Kms`}
+                    IconComponent={RiWalletFill}
+                    />
+                </div>
+            )}
         </div>
 
         <div
         className='absolute bottom-10 w-screen flex justify-center'>
-          <PanelButton 
-          buttonName={(vehicle) ? "Find A Driver" : "Choose Vehicle"}
-          disabled={!vehicle}
-          onClick={submitButtonHandler} 
+          <PanelButton
+          disabled={isLoading}
+          buttonName={isLoading ? "Creating Ride . . .": "Cancel Finding Ride"}
+          onClick={tempSubmitHandler} 
           />
         </div>
     

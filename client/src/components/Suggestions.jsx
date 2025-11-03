@@ -14,9 +14,9 @@ const Suggestions = ({onClick, suggestions, isSuggestionsLoading}) => {
         {!isSuggestionsLoading && suggestions.map((suggestion) =>{
             return <Suggestion 
             description={suggestion.description}
-            key={suggestion.place_id}
+            key={suggestion.placeId}
             onClick={() =>{
-              onClick(suggestion.description)
+              onClick(suggestion)
             }} 
             />
         })}

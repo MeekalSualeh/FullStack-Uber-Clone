@@ -7,7 +7,6 @@ import AuthContextProvider from "./contexts/AuthContextProvider.jsx"
 import CaptainContextProvider from "./contexts/CaptainContextProvider.jsx"
 import ChatContextProvider from "./contexts/ChatContextProvider.jsx"
 import RideContextProvider from "./contexts/RideContextProvider.jsx"
-import SocketContextProvider from "./contexts/SocketContextProvider.jsx"
 import UserContextProvider from "./contexts/UserContextProvider.jsx"
 
 createRoot(document.getElementById('root')).render(
@@ -16,13 +15,11 @@ createRoot(document.getElementById('root')).render(
       <CaptainContextProvider>
         <ChatContextProvider>
           <RideContextProvider>
-            <SocketContextProvider>
-              <UserContextProvider>
-                <BrowserRouter>
-                  <App />
-                </BrowserRouter>
-              </UserContextProvider>
-            </SocketContextProvider>
+            <UserContextProvider>
+              <BrowserRouter>
+                <App />
+              </BrowserRouter>
+            </UserContextProvider>
           </RideContextProvider>
         </ChatContextProvider>
       </CaptainContextProvider>

@@ -14,7 +14,7 @@ const VehicleType = ({
     <div 
     className={`${isFocused ? "ring-3 ring-black" : ""} flex mx-2 py-3 font-[helvetica] items-center rounded-xl bg-gray-100`}
     onClick={() =>{
-        onClick(vehicleType)
+        onClick(vehicleType, fare)
     }}>
 
         <div className="w-[28%] flex items-center h-full">

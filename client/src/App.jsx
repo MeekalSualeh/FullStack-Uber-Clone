@@ -1,5 +1,5 @@
 import React from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Outlet } from 'react-router-dom'
 import Home from './pages/Home'
 import UserLogin from './pages/UserLogin'
 import UserSignup from './pages/UserSignup'
@@ -11,6 +11,7 @@ import ProtectedRoute from './pages/ProtectedRoute'
 import AuthorizedRoute from './pages/AuthorizedRoute'
 import UserLogout from './pages/UserLogout'
 import CaptainLogout from './pages/CaptainLogout'
+import SocketContextProvider from "./contexts/SocketContextProvider.jsx"
 
 
 const App = () => {
@@ -23,8 +24,15 @@ const App = () => {
         <Route path="/captain-login" element={ <CaptainLogin /> } ></Route>
         <Route path="/captain-signup" element={ <CaptainSignup />} ></Route>
 
-        {/* Protected Routes */}
-        {/* <Route element={ <ProtectedRoute /> } >  */}
+
+          {/* Protected Routes */}
+        <Route element={ 
+          <ProtectedRoute>
+            <SocketContextProvider>
+              <Outlet />
+            </SocketContextProvider>
+          </ProtectedRoute> 
+          } > 
 
           {/* Captain Only Routes */}
           {/* <Route element={ <AuthorizedRoute roles={["captain"]} /> } > */}
@@ -38,7 +46,7 @@ const App = () => {
             <Route path="/user-logout" element={ <UserLogout />} ></Route>
           {/* </Route> */}
 
-        {/* </Route> */}
+        </Route>
       </Routes>
       
     </div>
