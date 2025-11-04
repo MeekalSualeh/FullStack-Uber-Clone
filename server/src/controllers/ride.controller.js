@@ -13,7 +13,14 @@ const handleCreatingRide = async (req, res) =>{
         return res.status(400).json({ error: result.error.issues[0].message })
     }
 
-    const { pickupCoordinates, destinationCoordinates, expectedDistance, expectedTime, fare, type } = result.data
+    const { 
+        pickupCoordinates, 
+        destinationCoordinates, 
+        expectedDistance, 
+        expectedTime, 
+        fare, 
+        type 
+    } = result.data
 
     try {
         let userId = req.userId;
@@ -54,7 +61,7 @@ const handleCreatingRide = async (req, res) =>{
             await user.save()
             await ride.save()
 
-            return res.status(200).json({ error: nearbyCaptains.error })
+            return res.status(200).json({ success: false, reason: nearbyCaptains.error })
         }
 
         // getting IO instance
@@ -72,17 +79,17 @@ const handleCreatingRide = async (req, res) =>{
 
         const rideTimeout = setTimeout(async () =>{
                 try {
-                    const timedOutRide = await rideModel.findOneAndUpdate({_id: ride._id, status: "waiting"}, { status: "ride-timeout" })
+                    const timedOutRide = await rideModel.findOneAndUpdate({_id: ride._id, status: "waiting"}, { status: "ride-timeout" }, {new: true})
                     
-                    if(timedOutRide.matchedCount === 0){
+                    if(!timedOutRide){
                         return;
                     }
 
                     const userSocketId = userIdToSocketId.get(userId.toString())
 
-                    const user = await userModel.findByIdAndUpdate(userId, { status: "online" })
+                    const user = await userModel.findByIdAndUpdate(userId, { status: "online" }, {new: true})
                     
-                    if(user.matchedCount === 0){
+                    if(!user){
                         return io.to(userSocketId).emit("error", {error: "No User found in Ride timeout"})
                     }
 
@@ -93,7 +100,7 @@ const handleCreatingRide = async (req, res) =>{
                     console.log(error)
                     return io.to(room).emit("error", {error: error.message})
                 }
-        }, 60000)
+        }, 6000)
 
         cache.set(`rideTimeout:${ride._id.toString()}`, rideTimeout)
 
