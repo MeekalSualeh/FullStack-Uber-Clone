@@ -24,7 +24,7 @@ const UserSearchPanel = ({
     try {
       const response = await getSuggestions(input)
       const suggestionsData = response.map((suggestion) =>{
-        const { description, place_id, structured_formatting } = suggestions
+        const { description, place_id, structured_formatting } = suggestion
         
         return {
           description: description,
@@ -33,7 +33,7 @@ const UserSearchPanel = ({
           secondaryText: structured_formatting.secondary_text
         }
       })
-      console.log(suggestionsData)
+      
       setSuggestions(suggestionsData)
 
     } catch (error) {
@@ -47,7 +47,7 @@ const UserSearchPanel = ({
 
   useEffect(() =>{
 
-    if(input.length > 1000){ // 1000 ki jagah 3 krna h
+    if(input.length > 3){ // 1000 ki jagah 3 krna h
       setIsSuggestionsLoading(true)
       
       const delay = setTimeout(() =>{

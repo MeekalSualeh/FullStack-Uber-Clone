@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { getDistanceTimeAndFare } from "../api/user.api"
+import { getDistanceTimeFareAndCoordinates } from "../api/user.api"
 import PanelButton from "../components/PanelButton"
 import VehicleType from "../components/VehicleType"
 import carImg from "/car.png"
@@ -11,37 +11,41 @@ const UserVehiclePanel = ({
   setVehicleType, 
   submitButtonHandler, 
   pickup, 
-  destination, 
+  destination,
   setFare,
   time,
   setTime,
   distance,
-  setDistance
+  setDistance,
+  setPickupCoordinates,
+  setDestinationCoordinates
 }) => {
 
-  const [isLoading, setIsLoading] = useState(false) //ise true krna h and useEffect ko uncomment krna h
+  const [isLoading, setIsLoading] = useState(true) //ise true krna h and useEffect ko uncomment krna h
   const [fares, setFares] = useState({})
 
-  // useEffect(() =>{
-  //   const fetchData = async () =>{
+  useEffect(() =>{
+    const fetchData = async () =>{
 
-  //     try {
-  //       const response = await getDistanceTimeAndFare(pickup, destination)
-  //       const { distance, time, fares } = response
-  //       setFares(fares)
-  //       setDistance(distance)
-  //       setTime(time)
-  
-  //     } catch (error) {
-  //       console.log(error) 
-  
-  //     } finally {
-  //       setIsLoading(false)
-  //     }
-  //   }
+      try {
+        const response = await getDistanceTimeFareAndCoordinates(pickup, destination)
+        const { distance, time, fares, pickupCoordinates, destinationCoordinates } = response
+        setFares(fares)
+        setDistance(distance)
+        setTime(time)
+        setPickupCoordinates(pickupCoordinates)
+        setDestinationCoordinates(destinationCoordinates)
 
-  //   fetchData()
-  // }, [])
+      } catch (error) {
+        console.log(error) 
+  
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
 
   const onClick = (vehicleType, fare) =>{
     setVehicleType(vehicleType)

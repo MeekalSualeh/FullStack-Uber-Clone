@@ -21,7 +21,7 @@ const getCoordinates = async (address) =>{
                 address
             }
         })
-        return response.data
+        return [response.data.lng, response.data.lat]
     
     } catch (error) {
         throw error.response?.data?.error || error.message
@@ -61,17 +61,22 @@ const getFares = async (distance, time) =>{
     }
 }
 
-const getDistanceTimeAndFare = async (origins, destinations) =>{
+const getDistanceTimeFareAndCoordinates = async (origins, destinations) =>{
     try {
         const distanceAndTimeResponse = await getDistanceTime(origins, destinations)
         const { distance, time } = distanceAndTimeResponse
 
         const fareResponse = await getFares(distance, time)
         
+        const pickupCoordinates = await getCoordinates(origins)
+        const destinationCoordinates = await getCoordinates(destinations)
+
         return {
             distance, 
             time, 
-            fares: fareResponse
+            fares: fareResponse,
+            pickupCoordinates,
+            destinationCoordinates
         }
 
     } catch (error) {
@@ -87,5 +92,5 @@ export {
     getCoordinates,
     getFares,
     getDistanceTime,
-    getDistanceTimeAndFare
+    getDistanceTimeFareAndCoordinates
 }

@@ -33,7 +33,6 @@ const UserSignup = () => {
   const submitHandler = async (e) =>{
     e.preventDefault()
     setIsSubmitting(true)
-    console.log(user)
 
     try {
       const response = await userSignup(user)

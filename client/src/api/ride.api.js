@@ -2,7 +2,8 @@ import { api } from "../config/axios.config"
 
 const createRide = async (data) =>{
     try {
-        const response = await api.post("/user/login", data)
+        const response = await api.post("/ride/create", data)
+
         return response.data
     
     } catch (error) {

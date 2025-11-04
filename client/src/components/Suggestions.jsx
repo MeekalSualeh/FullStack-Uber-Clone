@@ -4,7 +4,7 @@ const Suggestions = ({onClick, suggestions, isSuggestionsLoading}) => {
 
   return (
     <div
-    className='overflow-y-auto no-scrollbar flex flex-col items-center gap-y-3 h-80 mt-4 font-[helvetica]'>
+    className='overflow-y-scroll no-scrollbar flex flex-col items-center gap-y-4 h-[315px] mt-2 pt-2 font-[helvetica]'>
       
         {isSuggestionsLoading && (
           <div className='text-2xl tracking-tight text-slate-800'
@@ -13,7 +13,8 @@ const Suggestions = ({onClick, suggestions, isSuggestionsLoading}) => {
 
         {!isSuggestionsLoading && suggestions.map((suggestion) =>{
             return <Suggestion 
-            description={suggestion.description}
+            mainText={suggestion.mainText}
+            secondaryText={suggestion.secondaryText}
             key={suggestion.placeId}
             onClick={() =>{
               onClick(suggestion)

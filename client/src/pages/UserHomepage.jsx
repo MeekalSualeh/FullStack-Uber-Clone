@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import Logout from "../components/Logout"
+
 import Panel from "../components/Panel"
 import UserSearchPanel from '../panels/UserSearchPanel'
 import UserVehiclePanel from "../panels/UserVehiclePanel"
@@ -10,26 +11,33 @@ import UserRideCompletedPanel from "../panels/UserRideCompletedPanel"
 import RideTimedOutPanel from "../panels/RideTimedOutPanel"
 import RideCancelledByUserPanel from "../panels/RideCancelledByUserPanel"
 
+import useRideContext from "../contexts/RideContextProvider"
+
+import { useCaptainSocket, useChatSocket, useCommonSocket, useErrorSocket, useUserSocket } from "../hooks/SocketHooks"
+
 const UserHomepage = () => {
 
   const [pickup, setPickup] = useState("")
   const [destination, setDestination] = useState("")
-  const [mainAndSecondaryText, setMainAndSecondaryText] = useState({
-    pickup:{
-      mainText: "UBIT",
-      secondaryText: "Circular Road, University Of Karachi"
-    },
-    destination:{
-      mainText: "Maalik Welfare Organization",
-      secondaryText: "F.B Area, Gulberg Block-12, Karachi, Pakistan"
-    }
-  }) // hardcoded h ise null krna
+  const [mainAndSecondaryText, setMainAndSecondaryText] = useState({})
+  // const [mainAndSecondaryText, setMainAndSecondaryText] = useState({
+  //   pickup:{
+  //     mainText: "UBIT",
+  //     secondaryText: "Circular Road, University Of Karachi"
+  //   },
+  //   destination:{
+  //     mainText: "Maalik Welfare Organization",
+  //     secondaryText: "F.B Area, Gulberg Block-12, Karachi, Pakistan"
+  //   }
+  // }) // hardcoded h ise null krna
   const [focusedOn, setFocusedOn] = useState("")
 
+  const [pickupCoordinates, setPickupCoordinates] = useState(null)
+  const [destinationCoordinates, setDestinationCoordinates] = useState(null)
   const [vehicleType, setVehicleType] = useState("")
   const [fare, setFare] = useState(0) // hardcoded h ise null krna
-  const [time, setTime] = useState(1340) // hardcoded h ise null krna
-  const [distance, setDistance] = useState(12324) // hardcoded h ise null krna
+  const [time, setTime] = useState(0) // hardcoded h ise null krna
+  const [distance, setDistance] = useState(0) // hardcoded h ise null krna
 
   const [activePanel, setActivePanel] = useState("minimizedSearch")
 
@@ -42,9 +50,11 @@ const UserHomepage = () => {
   const [isRideTimedOutPanelInView, setIsRideTimedOutPanelInView] = useState(false)
   const [isRideCancelledByUserPanelInView, setIsRideCancelledByUserPanelInView] = useState(false)
 
-  const [isRideGettingCancelled, setIsRideGettingCancelled] = useState(false)
   // const panelArray = useRef(["minimizedSearch", "search", "vehicle", "findingDriver", "rideTimedOut", "rideCancelledByUser",  "waitingForDriver", "minimizedWaitingForDriver", "onTheRide", "minimizedOnTheRide", "rideCompleted"])
   const logoutRef = useRef(null)
+
+  useErrorSocket()
+  useUserSocket()
 
   const cancelRide = async () =>{
     
@@ -138,6 +148,8 @@ const UserHomepage = () => {
         setTime={setTime}
         distance={distance}
         setDistance={setDistance}
+        setPickupCoordinates={setPickupCoordinates}
+        setDestinationCoordinates={setDestinationCoordinates}
         submitButtonHandler={() =>{
           setIsFindingDriverPanelInView(true)
           setActivePanel("findingDriver")
@@ -164,7 +176,9 @@ const UserHomepage = () => {
         time={time}
         distance={distance}
         fare={fare}
-        onCancelTheRide={() =>{
+        destinationCoordinates={destinationCoordinates}
+        pickupCoordinates={pickupCoordinates}
+        onGoBack={() =>{
           setIsVehiclePanelInView(true)
           setActivePanel("vehicle")
         }}

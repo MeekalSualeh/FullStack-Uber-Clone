@@ -10,7 +10,7 @@ import RideContextProvider from "./contexts/RideContextProvider.jsx"
 import UserContextProvider from "./contexts/UserContextProvider.jsx"
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  // <StrictMode>
     <AuthContextProvider>
       <CaptainContextProvider>
         <ChatContextProvider>
@@ -24,5 +24,5 @@ createRoot(document.getElementById('root')).render(
         </ChatContextProvider>
       </CaptainContextProvider>
     </AuthContextProvider>
-  </StrictMode>
+  // </StrictMode> 
 )

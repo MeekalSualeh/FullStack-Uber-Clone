@@ -31,6 +31,8 @@ const Panel = ({
 
       gsap.to(element, {
         y:"100%",
+        borderTopLeftRadius:32,
+        borderTopRightRadius:32,
         onComplete:onInActive
       })
     }
