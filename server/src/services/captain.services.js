@@ -10,7 +10,7 @@ module.exports.getNearbyCaptains = async (pickupCoordinates, vehicleType) =>{
                         type: "Point",
                         coordinates: pickupCoordinates //lng, lat
                     },
-                    $maxDistance: 5000
+                    $maxDistance: 3000
                 }
             },
             status: "online",
@@ -20,10 +20,14 @@ module.exports.getNearbyCaptains = async (pickupCoordinates, vehicleType) =>{
         if(captainsId.length === 0){
             return { error: "No captains nearby" }
         }
+        
+        let captainsSocketId = captainsId
+        .map(({ _id }) => userIdToSocketId.get(_id.toString()))
+        .filter(Boolean)
 
-        let captainsSocketId = captainsId.map(({ _id }) => {
-            return userIdToSocketId.get(_id.toString())
-        });
+        if(captainsSocketId.length === 0){
+            return { error: "No captains nearby" }
+        }
 
         return captainsSocketId;
         
