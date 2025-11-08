@@ -17,17 +17,13 @@ module.exports.getNearbyCaptains = async (pickupCoordinates, vehicleType) =>{
             "vehicle.type": vehicleType
         }).select("_id")
 
-        if(captainsId.length === 0){
-            return { error: "No captains nearby" }
-        }
+        if(captainsId.length === 0) return { error: "No captains nearby" }
         
         let captainsSocketId = captainsId
         .map(({ _id }) => userIdToSocketId.get(_id.toString()))
         .filter(Boolean)
 
-        if(captainsSocketId.length === 0){
-            return { error: "No captains nearby" }
-        }
+        // if(captainsSocketId.length === 0) return { error: "No captains nearby" }
 
         return captainsSocketId;
         

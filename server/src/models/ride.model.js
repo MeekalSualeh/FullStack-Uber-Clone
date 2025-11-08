@@ -11,6 +11,10 @@ const rideSchema = new mongoose.Schema({
         ref: "captain"
     },
     pickup:{
+        name:{
+            type:String,
+            required: true
+        },
         type:{
             type: String,
             enum:["Point"],
@@ -19,9 +23,20 @@ const rideSchema = new mongoose.Schema({
         coordinates:{
             type: [ Number ],
             required: true
+        },
+        mainText:{
+            type: String,
+            required: true
+        },
+        secondaryText:{
+            type: String,
         }
     },
     destination:{
+        name:{
+            type:String,
+            required: true
+        },
         type:{
             type: String,
             enum:["Point"],
@@ -30,6 +45,13 @@ const rideSchema = new mongoose.Schema({
         coordinates:{ // lng, lat
             type: [ Number ],
             required: true
+        },
+        mainText:{
+            type: String,
+            required: true
+        },
+        secondaryText:{
+            type: String,
         }
     },
     vehicle:{

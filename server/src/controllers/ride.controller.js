@@ -14,8 +14,14 @@ const handleCreatingRide = async (req, res) =>{
     }
 
     const { 
-        pickupCoordinates, 
+        pickupCoordinates,
+        pickupName,
+        pickupMainText,
+        pickupSecondaryText,
         destinationCoordinates, 
+        destinationName,
+        destinationMainText,
+        destinationSecondaryText,
         expectedDistance, 
         expectedTime, 
         fare, 
@@ -34,10 +40,17 @@ const handleCreatingRide = async (req, res) =>{
         const ride = await rideModel.create({
             user: userId,
             pickup:{
-                coordinates: pickupCoordinates
+                name:pickupName,
+                coordinates: pickupCoordinates,
+                mainText: pickupMainText,
+                secondaryText: pickupSecondaryText
+
             },
             destination:{
-                coordinates: destinationCoordinates
+                name:destinationName,
+                coordinates: destinationCoordinates,
+                mainText: destinationMainText,
+                secondaryText: destinationSecondaryText
             },
             expectedDistance,
             expectedTime,

@@ -51,12 +51,40 @@ const rideSchema = z.object({
         invalid_type_error: "Coordinates must be number"
     }).length(2, { message: "Only need Longitude and latitude" }),
 
+    pickupName:z
+    .string()
+    .trim()
+    .min(3, { message: "Pickup name must be 3 characters long" }),
+
+    pickupMainText:z
+    .string()
+    .trim()
+    .min(3, { message: "Pickup main text must be 3 characters long" }),
+
+    pickupSecondaryText:z
+    .string()
+    .trim(),
+
     destinationCoordinates:z
     .array(z.number(),{
         required_error: "Destination coordinate are required",
         invalid_type_error: "Coordinates must be number"
     }).length(2, { message: "Only need Longitude and latitude" }),
 
+    destinationName:z
+    .string()
+    .trim()
+    .min(3, { message: "Destination name must be 3 characters long" }),
+
+    destinationMainText:z
+    .string()
+    .trim()
+    .min(3, { message: "Destination main text must be 3 characters long" }),
+
+    destinationSecondaryText:z
+    .string()
+    .trim(),
+    
     expectedDistance:z
     .number({ required_error: "distance is required" })
     .min(1, { message: "Distance cannot be less than 1m"}),
