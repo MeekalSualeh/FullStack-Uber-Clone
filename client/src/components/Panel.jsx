@@ -2,6 +2,7 @@ import { useGSAP } from "@gsap/react"
 import gsap from "gsap"
 import { useRef } from "react"
 import PanelCloser from "./PanelCloser"
+import PanelMinimizer from "./PanelMinimizer"
 
 const Panel = ({ 
   isActive,
@@ -10,43 +11,65 @@ const Panel = ({
   minimizedY = "63%",
   heading,
   onPanelClose = false,
+  onPanelMinimize = false,
+  onPanelMaximize = false,
   defaultY = "100%",
   children }) => {
 
   const panelRef = useRef(null)
+  const minimizerRef = useRef(null)
 
   useGSAP(() =>{
-    const element = panelRef.current
+    const panelElement = panelRef.current;
+    // const minimizeElement = minimizerRef.current
+
+    // console.log(minimizeElement)
+    // console.log(minimizerRef.current)
+
+    const onActivePanelOptions = {
+      y:"0%",
+      borderTopLeftRadius:0,
+      borderTopRightRadius:0,
+    }
+
+    const onActiveMinimizeOptions = {
+      rotate: -180,
+      duration: 0.8
+    }
+
+    const onMinimizePanelOptions = {
+      y:minimizedY,
+      borderTopLeftRadius:32,
+      borderTopRightRadius:32
+    }
+
+    const onMinimizeMaximizeOptions = {
+      rotate: 0,
+      duration: 0.8
+    }
+
+    const onInActiveOptions = {
+      y:"100%",
+      borderTopLeftRadius:32,
+      borderTopRightRadius:32,
+      onComplete:onInActive
+    }
 
     if(isActive){
+      gsap.to(panelElement, onActivePanelOptions)
 
-      gsap.to(element, {
-        y:"0%",
-        borderTopLeftRadius:0,
-        borderTopRightRadius:0
-      })
+      if(onPanelMinimize) gsap.to(minimizerRef.current, onActiveMinimizeOptions)
     }
-
-    else if(!isActive && !isMinimized){
-
-      gsap.to(element, {
-        y:"100%",
-        borderTopLeftRadius:32,
-        borderTopRightRadius:32,
-        onComplete:onInActive
-      })
-    }
-
+  
     else if(isMinimized){
+      gsap.to(panelElement, onMinimizePanelOptions)
 
-      gsap.to(element, {
-        y:minimizedY,
-        borderTopLeftRadius:32,
-        borderTopRightRadius:32
-      })
+      if(onPanelMaximize) gsap.to(minimizerRef.current, onMinimizeMaximizeOptions)
     }
 
-  }, [isActive, isMinimized])
+    else if(!isActive && !isMinimized) gsap.to(panelElement, onInActiveOptions)
+
+  }, [isActive, isMinimized, panelRef.current, minimizerRef.current])
 
   return (
     <div
@@ -64,6 +87,13 @@ const Panel = ({
           size="text-lg"
           color="bg-gray-100"
           onClick={onPanelClose}/>
+          }
+
+          {(onPanelMinimize && (isActive || isMinimized)) && <PanelMinimizer
+          ref={minimizerRef}
+          size="text-2xl"
+          color="bg-gray-100"
+          onClick={isMinimized ? onPanelMaximize : onPanelMinimize}/>
           }
 
         </div>

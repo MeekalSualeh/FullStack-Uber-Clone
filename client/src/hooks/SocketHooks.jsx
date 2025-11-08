@@ -35,9 +35,9 @@ import { useAuthContext } from "../contexts/AuthContextProvider"
 // update-location          - All
 // remove-ride              - All
 // ride-accepted            - All
-// cancelled-by-captain     - All
 // ride-started             - All
 // ride-completed           - All
+// cancelled-by-captain     - All
 // cancelled-by-user        - All
 
 // error                    - All --Done
@@ -45,10 +45,17 @@ import { useAuthContext } from "../contexts/AuthContextProvider"
 // message-from-backend     - All --Done
 
 
-const useUserSocket = () => {
+const useUserSocket = (
+    rideCancelledByUserSocketHandler, 
+    rideCancelledByCaptainSocketHandler,
+    rideAcceptedSocketHandler,
+    rideStartedSocketHandler,
+    rideCompletedSocketHandler
+) => {
+
     const {socket} = useSocketContext()
-    const {} = useUserContext()
-    const {} = useCaptainContext()
+    const {setUserData} = useUserContext()
+    const {setCaptainData} = useCaptainContext()
     const {} = useChatContext()
     const { setRideData, setCancelledBy, setIsCancellingRide } = useRideContext()
 
@@ -70,16 +77,50 @@ const useUserSocket = () => {
             setRideData(null)
             setCancelledBy("cancelledByUser")
             setIsCancellingRide(false)
+            rideCancelledByUserSocketHandler()
         }
 
+        const cancelledByCaptainHandler = ({ rideId }) =>{
+            setRideData(null)
+            setCancelledBy("cancelledByCaptain")
+            setIsCancellingRide(false)
+            rideCancelledByCaptainSocketHandler()
+        }
+
+        const rideAcceptedHandler = ({ ride, user, captain }) =>{
+            setRideData(ride)
+            setUserData(user)
+            setCaptainData(captain)
+            rideAcceptedSocketHandler()
+        }
+        
+        const rideStartedHandler = ({ rideId }) =>{
+            setRideData(prev => ({...prev, status:"on-the-way"}))
+            rideStartedSocketHandler()
+        }
+        
+        const rideCompletedHandler = ({ rideId }) =>{
+            setRideData(prev => ({...prev, status:"completed"}))
+            rideCompletedSocketHandler()
+        }
+
+
         socket.current?.on("cancelled-by-user", cancelledByUserHandler)
+        socket.current?.on("cancelled-by-captain", cancelledByCaptainHandler)
         socket.current?.on("remove-ride", removeRideHandler)
         socket.current?.on("ride-timeout", rideTimeoutHandler)
+        socket.current?.on("ride-accepted", rideAcceptedHandler)
+        socket.current?.on("ride-started", rideStartedHandler)
+        socket.current?.on("ride-completed", rideCompletedHandler)
         
         return () =>{
             socket.current.off("cancelled-by-user", cancelledByUserHandler)
+            socket.current.off("cancelled-by-captain", cancelledByCaptainHandler)
             socket.current.off("remove-ride", removeRideHandler)
             socket.current.off("ride-timeout", rideTimeoutHandler)
+            socket.current.off("ride-accepted", rideAcceptedHandler)
+            socket.current.off("ride-started", rideStartedHandler)
+            socket.current.off("ride-completed", rideCompletedHandler)
         }
 
     }, [socket.current])

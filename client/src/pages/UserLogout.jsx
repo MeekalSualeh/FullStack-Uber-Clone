@@ -4,15 +4,22 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthContext } from '../contexts/AuthContextProvider'
 
 const UserLogout = () => {
-    const {setIsLoggedin, setRole} = useAuthContext();
+    const {isLoggedin, setIsLoggedin, setRole} = useAuthContext();
     const navigate = useNavigate();
 
     useEffect(() =>{
         const logout = async () =>{
-            const response = await userLogout()
-
-            setIsLoggedin(false);
-            setRole(null)
+            if(isLoggedin){
+                try {
+                    const response = await userLogout()
+                    
+                } catch (error) {
+                    console.log(error)
+                }
+    
+                setIsLoggedin(false);
+                setRole(null)
+            }
             navigate("/user-login")
         }
 

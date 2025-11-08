@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import PanelButton from "../components/PanelButton"
 import AnimatedTitlePing from "../components/AnimatedTitlePing"
 import AnimatedVehicle from "../components/AnimatedVehicle"
@@ -7,34 +7,32 @@ import motoImg from "/moto.webp"
 import autoImg from "/auto.webp"
 import SingleInfo from "../components/SingleInfo"
 import { RiMapPin2Fill, RiWalletFill, RiErrorWarningFill, RiHourglassFill } from "@remixicon/react"
-import { useUserContext } from "../contexts/UserContextProvider"
 import { useRideContext } from "../contexts/RideContextProvider"
 import { createRide } from "../api/ride.api"
-import { useSocketContext } from "../contexts/SocketContextProvider"
 
 const UserFindingDriverPanel = ({
-    onGoBack, 
-    vehicleType, 
-    mainAndSecondaryText,
-    fare,
-    time,
-    distance,
-    pickupCoordinates,
-    destinationCoordinates
+  vehicleType, 
+  mainAndSecondaryText,
+  fare,
+  time,
+  distance,
+  pickup,
+  pickupCoordinates,
+  destination,
+  destinationCoordinates,
+  onGoBack, 
+  onCancelFindingDriver
 }) => {
 
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  const { userData } = useUserContext()
-  const {socket} = useSocketContext()
   const { 
     rideData, 
     setRideData, 
     cancelledBy,
     setCancelledBy,
     isCancellingRide, 
-    setIsCancellingRide
   } = useRideContext()
 
   let cancelReason = "";
@@ -48,8 +46,14 @@ const UserFindingDriverPanel = ({
 
       try {
         const response = await createRide({ 
-          pickupCoordinates, 
-          destinationCoordinates, 
+          pickupCoordinates,
+          pickupName: pickup,
+          pickupMainText: mainAndSecondaryText.pickup.mainText,
+          pickupSecondaryText: mainAndSecondaryText.pickup.secondaryText,
+          destinationCoordinates,
+          destinationName: mainAndSecondaryText.destination.mainText, 
+          destinationMainText: mainAndSecondaryText.destination.secondaryText, 
+          destinationSecondaryText: destination, 
           expectedDistance: distance, 
           expectedTime: time,
           fare,
@@ -83,14 +87,6 @@ const UserFindingDriverPanel = ({
     onGoBack()
   }
 
-  const onCancelFindingDriver = () =>{
-    // if(!socket?.current) return;
-
-    setIsCancellingRide(true)
-    socket.current?.emit("cancelled-by-user", {rideId: rideData._id})
-  }
-  
-
   return (
     <>
         <div className="flex flex-col w-[85%] mt-5 mx-auto items-center">
@@ -102,8 +98,8 @@ const UserFindingDriverPanel = ({
             />
 
             <AnimatedTitlePing 
-            steadyColor={isLoading ? "bg-orange-400" : "bg-green-400"}
-            blinkingColor={isLoading ? "bg-orange-400" : "bg-green-400"}
+            steadyColor={(isLoading || error || cancelReason) ? "bg-orange-400" : "bg-green-400"}
+            blinkingColor={(isLoading || error || cancelReason) ? "bg-orange-400" : "bg-green-400"}
             title="Looking For Nearby Drivers..."/>
 
             {isLoading && <div className="text-xl font-semibold text-slate-800 mt-10">Creating Ride...</div>}

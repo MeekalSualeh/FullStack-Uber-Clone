@@ -1,35 +1,36 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Logout from "../components/Logout"
 
 import Panel from "../components/Panel"
 import UserSearchPanel from '../panels/UserSearchPanel'
 import UserVehiclePanel from "../panels/UserVehiclePanel"
 import UserFindingDriverPanel from "../panels/UserFindingDriverPanel"
-import UserWaitingForDriverPanel from "../panels/UserWaitingForDriverPanel"
-import UserOnTheRidePanel from "../panels/UserOnTheRidePanel"
+import UserWaitingForDriverPanel from "../panels/UserWaitingForDriverPanel" // iskay handler bananay and laganay h
+import UserOnTheRidePanel from "../panels/UserOnTheRidePanel" 
 import UserRideCompletedPanel from "../panels/UserRideCompletedPanel"
-import RideTimedOutPanel from "../panels/RideTimedOutPanel"
-import RideCancelledByUserPanel from "../panels/RideCancelledByUserPanel"
+import RideCancelledPanel from "../panels/RideCancelledPanel"
+import ChatPanel from "../panels/ChatPanel"
 
-import useRideContext from "../contexts/RideContextProvider"
+import { useChatSocket, useCommonSocket, useErrorSocket, useUserSocket } from "../hooks/SocketHooks"
+import { useRideContext } from '../contexts/RideContextProvider'
+import { useSocketContext } from '../contexts/SocketContextProvider'
 
-import { useCaptainSocket, useChatSocket, useCommonSocket, useErrorSocket, useUserSocket } from "../hooks/SocketHooks"
 
 const UserHomepage = () => {
 
   const [pickup, setPickup] = useState("")
   const [destination, setDestination] = useState("")
-  const [mainAndSecondaryText, setMainAndSecondaryText] = useState({})
-  // const [mainAndSecondaryText, setMainAndSecondaryText] = useState({
-  //   pickup:{
-  //     mainText: "UBIT",
-  //     secondaryText: "Circular Road, University Of Karachi"
-  //   },
-  //   destination:{
-  //     mainText: "Maalik Welfare Organization",
-  //     secondaryText: "F.B Area, Gulberg Block-12, Karachi, Pakistan"
-  //   }
-  // }) // hardcoded h ise null krna
+  // const [mainAndSecondaryText, setMainAndSecondaryText] = useState({})
+  const [mainAndSecondaryText, setMainAndSecondaryText] = useState({
+    pickup:{
+      mainText: "UBIT",
+      secondaryText: "Circular Road, University Of Karachi"
+    },
+    destination:{
+      mainText: "Maalik Welfare Organization",
+      secondaryText: "F.B Area, Gulberg Block-12, Karachi, Pakistan"
+    }
+  }) // hardcoded h ise null krna
   const [focusedOn, setFocusedOn] = useState("")
 
   const [pickupCoordinates, setPickupCoordinates] = useState(null)
@@ -39,36 +40,59 @@ const UserHomepage = () => {
   const [time, setTime] = useState(0) // hardcoded h ise null krna
   const [distance, setDistance] = useState(0) // hardcoded h ise null krna
 
-  const [activePanel, setActivePanel] = useState("minimizedSearch")
+  const [activePanel, setActivePanel] = useState("chat") // change it to minimizedSearch
 
-  const [isSearchPanelInView, setIsSearchPanelInView] = useState(true)
+  const [isSearchPanelInView, setIsSearchPanelInView] = useState(false) // isko true and baki sab ko false krna h
   const [isVehiclePanelInView, setIsVehiclePanelInView] = useState(false)
   const [isFindingDriverPanelInView, setIsFindingDriverPanelInView] = useState(false)
   const [isWaitingForDriverPanelInView, setIsWaitingForDriverPanelInView] = useState(false)
   const [isOnTheRidePanelInView, setIsOnTheRidePanelInView] = useState(false)
   const [isRideCompletedPanelInView, setIsRideCompletedPanelInView] = useState(false)
-  const [isRideTimedOutPanelInView, setIsRideTimedOutPanelInView] = useState(false)
-  const [isRideCancelledByUserPanelInView, setIsRideCancelledByUserPanelInView] = useState(false)
+  const [isRideCancelledPanelInView, setIsRideCancelledPanelInView] = useState(false)
+  const [isChatPanelInView, setIsChatPanelInView] = useState(true)
 
-  // const panelArray = useRef(["minimizedSearch", "search", "vehicle", "findingDriver", "rideTimedOut", "rideCancelledByUser",  "waitingForDriver", "minimizedWaitingForDriver", "onTheRide", "minimizedOnTheRide", "rideCompleted"])
+  // const panelArray = useRef(["minimizedSearch", "search", "vehicle", "findingDriver", "rideTimedOut", "waitingForDriver", "minimizedWaitingForDriver", "onTheRide", "minimizedOnTheRide", "rideCompleted", "rideCancelledByUser", "rideCancelledByCaptain", "chat"])
+
+  const {socket} = useSocketContext()
+  const {rideData, cancelledBy, setCancelledBy} = useRideContext()
+  
   const logoutRef = useRef(null)
 
-  useErrorSocket()
-  useUserSocket()
-
-  const cancelRide = async () =>{
-    
+  const onRideCancelledByUser = () =>{
+    setIsCancellingRide(true)
+    socket.current?.emit("cancelled-by-user", {rideId: rideData._id})
   }
 
-  const onRideCancelledByUser = async () =>{
-    setIsRideCancelledByUserPanelInView(true)
+  const rideCancelledByUserSocketHandler = () =>{
+    setIsRideCancelledPanelInView(true)
     setActivePanel("rideCancelledByUser")
-    setIsRideGettingCancelled(true)
-
-    await cancelRide()
-
-    setIsRideGettingCancelled(false)
   }
+  
+  const rideCancelledByCaptainSocketHandler = () =>{
+    setIsRideCancelledPanelInView(true)
+    setActivePanel("rideCancelledByCaptain")
+  }
+
+  // Socket Event Hooks
+  useErrorSocket()
+  useUserSocket(rideCancelledByUserSocketHandler, rideCancelledByCaptainSocketHandler)
+  useChatSocket()
+  useCommonSocket()
+
+  let cancellationBy;
+  useEffect(() =>{
+    cancellationBy = cancelledBy === "cancelledByUser" ? "User" : "Captain"
+  }, [cancelledBy])
+
+  useEffect(() =>{ // socket m data anay par values set krnay k liye
+
+    switch(rideData.status){
+      case "" :
+
+    }
+
+  }, [rideData])
+
 
   return (
     <div className='flex flex-col h-screen w-screen text-[helvetica] relative overflow-hidden'>
@@ -165,9 +189,7 @@ const UserHomepage = () => {
         <Panel 
         isActive={activePanel === "findingDriver"}
         heading="Finding Driver"
-        onInActive={() =>{
-          setIsFindingDriverPanelInView(false)
-        }}
+        onInActive={() => setIsFindingDriverPanelInView(false) }
         >
 
         <UserFindingDriverPanel
@@ -176,16 +198,20 @@ const UserHomepage = () => {
         time={time}
         distance={distance}
         fare={fare}
-        destinationCoordinates={destinationCoordinates}
+        pickup={pickup}
         pickupCoordinates={pickupCoordinates}
+        destination={destination}
+        destinationCoordinates={destinationCoordinates}
         onGoBack={() =>{
           setIsVehiclePanelInView(true)
           setActivePanel("vehicle")
         }}
+        onCancelFindingDriver={onRideCancelledByUser}
         />
 
         </Panel>
       ))}
+
 
       {/* Waiting For Driver Panel */}
       {(isWaitingForDriverPanelInView && (
@@ -193,66 +219,125 @@ const UserHomepage = () => {
         isActive={activePanel === "waitingForDriver"}  
         heading="Waiting For Driver"
         isMinimized = {activePanel === "minimizedWaitingForDriver"}
-        onInActive={() =>{
-          setIsWaitingForDriverPanelInView(false)
-        }}
+        onInActive={() => setIsWaitingForDriverPanelInView(false) }
+        onPanelMinimize={() => setActivePanel("minimizedWaitingForDriver") }
+        onPanelMaximize={() => setActivePanel("waitingForDriver") }
         >
 
         <UserWaitingForDriverPanel
-        onRideCancelledByUser={onRideCancelledByUser}
-        />
-
-        </Panel>
-      ))}
-
-      {/* Ride Cancelled By User Panel */}
-      {(isRideCancelledByUserPanelInView && (
-        <Panel 
-        isActive={activePanel === "vehicle"}  
-        heading="Choose a Vehicle"
-        onInActive={() =>{
-          setIsVehiclePanelInView(false)
+        cancelRideHandler={onRideCancelledByUser}
+        onGoBack={() =>{
+          setIsVehiclePanelInView(true)
+          setActivePanel("vehicle")
         }}
-        onPanelClose={() =>{
-          setIsSearchPanelInView(true)
-          setActivePanel("search")
-          setVehicleType("")
-        }}>
-
-        <UserVehiclePanel
-        vehicle={vehicleType}
-        setVehicle={setVehicleType}
-        submitButtonHandler={() =>{
-          setIsFindingdriverPanelInView(true)
-          setActivePanel("findingDriver")
+        chatHandler={()=>{
+          setIsChatPanelInView(true)
+          setActivePanel("chat")
         }}
         />
 
         </Panel>
       ))}
+
 
       {/* Waiting For Driver Panel */}
       {(isWaitingForDriverPanelInView && (
         <Panel 
-        isActive={activePanel === "vehicle"}  
-        heading="Choose a Vehicle"
-        onInActive={() =>{
-          setIsVehiclePanelInView(false)
-        }}
-        onPanelClose={() =>{
-          setIsSearchPanelInView(true)
-          setActivePanel("search")
-          setVehicleType("")
-        }}>
+        isActive={activePanel === "waitingForDriver"}  
+        heading="Waiting For Driver"
+        isMinimized = {activePanel === "minimizedWaitingForDriver"}
+        onInActive={() => setIsWaitingForDriverPanelInView(false) }
+        onPanelMinimize={() => setActivePanel("minimizedWaitingForDriver") }
+        onPanelMaximize={() => setActivePanel("waitingForDriver") }
+        >
 
-        <UserVehiclePanel
-        vehicle={vehicleType}
-        setVehicle={setVehicleType}
-        submitButtonHandler={() =>{
-          setIsFindingdriverPanelInView(true)
-          setActivePanel("findingDriver")
+        <UserWaitingForDriverPanel
+        cancelRideHandler={onRideCancelledByUser}
+        onGoBack={() =>{
+          setIsVehiclePanelInView(true)
+          setActivePanel("vehicle")
+        }}
+        chatHandler={()=>{
+          setIsChatPanelInView(true)
+          setActivePanel("chat")
         }}
         />
+
+        </Panel>
+      ))}
+
+
+      {/* Waiting For Driver Panel */}
+      {(isWaitingForDriverPanelInView && (
+        <Panel 
+        isActive={activePanel === "waitingForDriver"}  
+        heading="Waiting For Driver"
+        isMinimized = {activePanel === "minimizedWaitingForDriver"}
+        onInActive={() => setIsWaitingForDriverPanelInView(false) }
+        onPanelMinimize={() => setActivePanel("minimizedWaitingForDriver") }
+        onPanelMaximize={() => setActivePanel("waitingForDriver") }
+        >
+
+        <UserWaitingForDriverPanel
+        cancelRideHandler={onRideCancelledByUser}
+        onGoBack={() =>{
+          setIsVehiclePanelInView(true)
+          setActivePanel("vehicle")
+        }}
+        chatHandler={()=>{
+          setIsChatPanelInView(true)
+          setActivePanel("chat")
+        }}
+        />
+
+        </Panel>
+      ))}
+
+
+      {/* Ride Cancelled Panel */}
+      {(isRideCancelledPanelInView && (
+        <Panel 
+        isActive={activePanel === "rideCancelledByUser" || activePanel === "rideCancelledByCaptain"}  
+        // isActive={cancellationBy}  
+        heading={`Ride Cancelled By ${cancellationBy || "User"}`} // iski default value hatani h
+        onInActive={() =>{
+          setIsRideCancelledPanelInView(false)
+        }}>
+
+        <RideCancelledPanel
+        rideCancelledBy={cancellationBy || "User"}
+        onGoBack={() =>{
+          setCancelledBy("")
+          setIsSearchPanelInView(true)
+          setActivePanel("minimizedSearch")
+          cancellationBy=""
+        }}
+        />
+
+        </Panel>
+      ))}
+
+
+      {/* Chat Panel */}
+      {(isChatPanelInView && (
+        <Panel 
+        isActive={activePanel === "chat"}  
+        heading="Chat With Captain"
+        onInActive={() =>{
+          setIsChatPanelInView(false)
+        }}
+        onPanelClose={() =>{
+          if(rideData.status === "accepted"){
+            setIsWaitingForDriverPanelInView(true)
+            setActivePanel("waitingForDriver")
+            
+          } else {
+            setIsOnTheRidePanelInView(true)
+            setActivePanel("onTheRide")
+          }
+        }}>
+
+        <ChatPanel/>
 
         </Panel>
       ))}

@@ -80,14 +80,14 @@ const UserSearchPanel = ({
         <div className='h-44 flex flex-col mx-auto justify-evenly'>
 
           <SearchField 
-          label="Enter Pickup" 
+          placeholder="Enter Pickup" 
           name="pickup" 
           value={pickup} 
           onChange={inputHandler} 
           onClick={searchPanelClickHandler}/>
 
           <SearchField 
-          label="Enter Destination" 
+          placeholder="Enter Destination" 
           name="destination"
           value={destination} 
           onChange={inputHandler} 
