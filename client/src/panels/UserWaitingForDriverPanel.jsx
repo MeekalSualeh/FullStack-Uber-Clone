@@ -42,7 +42,7 @@ const UserWaitingForDriverPanel = ({
           title="Captain is on his way..."/>
         </div>
 
-        <div className="w-full mt-5 flex flex-col gap-y-4 h-[240px] overflow-y-auto no-scrollbar py-1 px-1">
+        <div className="w-full mt-5 flex flex-col gap-y-4 h-[250px] overflow-y-auto no-scrollbar py-1 px-1">
 
           <SingleInfo
           title="OTP: 1234"
@@ -54,7 +54,7 @@ const UserWaitingForDriverPanel = ({
 
           <SingleInfo
           title="Vehicle"
-          content={`Type: ${vehicle.type} Color: ${vehicle.color} Plate: ${vehicle.plate}`}
+          content={`Type: ${vehicle.type} | Color: ${vehicle.color} | Plate: ${vehicle.plate}`}
           IconComponent={RiTaxiFill}
           extraParentContainerClass="ring-1 ring-slate-400"
           />
@@ -96,7 +96,7 @@ const UserWaitingForDriverPanel = ({
 
       </div>
       <div
-      className='absolute bottom-7 w-screen flex flex-col items-center gap-y-4'>
+      className='absolute bottom-4 w-screen flex flex-col items-center gap-y-4'>
         <PanelButton 
         buttonName="Chat With Captain"
         disabled={isCancellingRide || error}

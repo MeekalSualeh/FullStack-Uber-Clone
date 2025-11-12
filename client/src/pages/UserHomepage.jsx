@@ -40,16 +40,16 @@ const UserHomepage = () => {
   const [time, setTime] = useState(0) // hardcoded h ise null krna
   const [distance, setDistance] = useState(0) // hardcoded h ise null krna
 
-  const [activePanel, setActivePanel] = useState("chat") // change it to minimizedSearch
+  const [activePanel, setActivePanel] = useState("rideCompleted") // change it to minimizedSearch
 
   const [isSearchPanelInView, setIsSearchPanelInView] = useState(false) // isko true and baki sab ko false krna h
   const [isVehiclePanelInView, setIsVehiclePanelInView] = useState(false)
   const [isFindingDriverPanelInView, setIsFindingDriverPanelInView] = useState(false)
   const [isWaitingForDriverPanelInView, setIsWaitingForDriverPanelInView] = useState(false)
-  const [isOnTheRidePanelInView, setIsOnTheRidePanelInView] = useState(false)
-  const [isRideCompletedPanelInView, setIsRideCompletedPanelInView] = useState(false)
+  const [isOnTheRidePanelInView, setIsOnTheRidePanelInView] = useState(true)
+  const [isRideCompletedPanelInView, setIsRideCompletedPanelInView] = useState(true)
   const [isRideCancelledPanelInView, setIsRideCancelledPanelInView] = useState(false)
-  const [isChatPanelInView, setIsChatPanelInView] = useState(true)
+  const [isChatPanelInView, setIsChatPanelInView] = useState(false)
 
   // const panelArray = useRef(["minimizedSearch", "search", "vehicle", "findingDriver", "rideTimedOut", "waitingForDriver", "minimizedWaitingForDriver", "onTheRide", "minimizedOnTheRide", "rideCompleted", "rideCancelledByUser", "rideCancelledByCaptain", "chat"])
 
@@ -281,12 +281,58 @@ const UserHomepage = () => {
         <UserWaitingForDriverPanel
         cancelRideHandler={onRideCancelledByUser}
         onGoBack={() =>{
-          setIsVehiclePanelInView(true)
-          setActivePanel("vehicle")
+          setIsSearchPanelInView(true)
+          setActivePanel("minimizedSearch")
         }}
         chatHandler={()=>{
           setIsChatPanelInView(true)
           setActivePanel("chat")
+        }}
+        />
+
+        </Panel>
+      ))}
+
+
+      {/* User On The Ride Panel */}
+      {(isOnTheRidePanelInView && (
+        <Panel 
+        isActive={activePanel === "onTheRide"}  
+        heading="To The Destination"
+        isMinimized = {activePanel === "minimizedOnTheRide"}
+        onInActive={() => setIsOnTheRidePanelInView(false) }
+        onPanelMinimize={() => setActivePanel("minimizedOnTheRide") }
+        onPanelMaximize={() => setActivePanel("onTheRide") }
+        >
+
+        <UserOnTheRidePanel
+        cancelRideHandler={onRideCancelledByUser}
+        onGoBack={() =>{
+          setIsSearchPanelInView(true)
+          setActivePanel("minimizedSearch")
+        }}
+        chatHandler={()=>{
+          setIsChatPanelInView(true)
+          setActivePanel("chat")
+        }}
+        />
+
+        </Panel>
+      ))}
+
+
+      {/* Ride Completed Panel */}
+      {(isRideCompletedPanelInView && (
+        <Panel 
+        isActive={activePanel === "rideCompleted"}  
+        heading="Ride Completion"
+        onInActive={() => setIsOnTheRidePanelInView(false) }
+        >
+
+        <UserRideCompletedPanel
+        onFinish={() =>{
+          setIsSearchPanelInView(true)
+          setActivePanel("minimizedSearch")
         }}
         />
 

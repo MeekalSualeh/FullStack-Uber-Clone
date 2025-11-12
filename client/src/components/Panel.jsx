@@ -21,10 +21,6 @@ const Panel = ({
 
   useGSAP(() =>{
     const panelElement = panelRef.current;
-    // const minimizeElement = minimizerRef.current
-
-    // console.log(minimizeElement)
-    // console.log(minimizerRef.current)
 
     const onActivePanelOptions = {
       y:"0%",
@@ -33,8 +29,8 @@ const Panel = ({
     }
 
     const onActiveMinimizeOptions = {
-      rotate: -180,
-      duration: 0.8
+      rotate: 0,
+      duration: 0.6
     }
 
     const onMinimizePanelOptions = {
@@ -44,8 +40,8 @@ const Panel = ({
     }
 
     const onMinimizeMaximizeOptions = {
-      rotate: 0,
-      duration: 0.8
+      rotate: -180,
+      duration: 0.6
     }
 
     const onInActiveOptions = {
