@@ -17,7 +17,7 @@ const RideCancelledPanel = ({
         <AnimatedTitlePing
           steadyColor="bg-red-500"
           blinkingColor="bg-red-500"
-          title={`Cancellation Of Ride By ${rideCancelledBy}`}
+          title={`Ride Cancelled By ${rideCancelledBy}`}
           />
 
           <p className="text-center text-md text-black font-semibold">

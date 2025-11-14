@@ -1,4 +1,10 @@
-const AnimatedTitlePing = ({title, steadyColor, blinkingColor}) => {
+const AnimatedTitlePing = ({
+  title, 
+  steadyColor, 
+  blinkingColor
+
+}) => {
+
   return (
     <div className='w-full flex flex-col relative items-center'>
 

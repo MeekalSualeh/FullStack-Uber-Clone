@@ -11,10 +11,11 @@ import { useRideContext } from "../contexts/RideContextProvider"
 import { useCaptainContext } from "../contexts/CaptainContextProvider"
 
 const UserRideCompletedPanel = ({
+  role = "user",
   onFinish
 }) => {
 
-  const {rideData, isCancellingRide} = useRideContext()
+  const {rideData} = useRideContext()
   const {pickup, destination, vehicle, expectedDistance: distance, expectedTime: time, fare} = rideData
 
   const { captainData: captain } = useCaptainContext()
@@ -41,7 +42,7 @@ const UserRideCompletedPanel = ({
       <div className="w-full mt-5 flex flex-col gap-y-4 h-[310px] overflow-y-auto no-scrollbar py-1 px-1">
 
         <SingleInfo
-        title={`Captain: Meekal Sualeh`}
+        title={role === "captain" ? "User: Meekal Sualeh" : `Captain: Meekal Sualeh`}
         IconComponent={RiRidingFill}
         extraParentContainerClass="ring-1 ring-slate-400"
         contentBigger={true}

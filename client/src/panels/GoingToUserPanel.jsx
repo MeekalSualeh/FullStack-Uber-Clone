@@ -10,9 +10,7 @@ import { RiErrorWarningFill, RiMapPin2Fill, RiWalletFill, RiTaxiFill, RiRidingFi
 import { useRideContext } from "../contexts/RideContextProvider"
 import { useCaptainContext } from "../contexts/CaptainContextProvider"
 
-const UserOnTheRidePanel = ({
-  heading="Sit tight and enjoy the ride",
-  chatButtonName="Chat with Captain",
+const GoingToUserPanel = ({
   onGoBack,
   cancelRideHandler,
   chatHandler
@@ -20,7 +18,7 @@ const UserOnTheRidePanel = ({
 
   const [error, setError] = useState(false)
 
-  const {rideData, isCancellingRide} = useRideContext()
+  const {rideData, isCancellingRide } = useRideContext()
   const {pickup, destination, vehicle, expectedDistance: distance, expectedTime: time, fare} = rideData
 
   const { captainData: captain } = useCaptainContext()
@@ -32,7 +30,6 @@ const UserOnTheRidePanel = ({
         {!error && 
         <>
         <div className="w-full flex flex-col items-center mb-8">
-
           <AnimatedVehicle
           imgSrc={vehicle.type === "car" ? carImg : vehicle.type === "moto" ? motoImg : autoImg}
           mtClass="mb-5"
@@ -42,15 +39,13 @@ const UserOnTheRidePanel = ({
           <AnimatedTitlePing
           steadyColor={(false) ? "bg-orange-400" : "bg-green-400"}
           blinkingColor={(false) ? "bg-orange-400" : "bg-green-400"}
-          title={heading} 
-          />
-
+          title="User is waiting for ya ..."/>
         </div>
 
         <div className="w-full mt-5 flex flex-col gap-y-4 h-[250px] overflow-y-auto no-scrollbar py-1 px-1">
 
           <SingleInfo
-          title={`Captain: Meekal Sualeh`}
+          title="User: Meekal Sualeh"
           IconComponent={RiRidingFill}
           extraParentContainerClass="ring-1 ring-slate-400"
           contentBigger={true}
@@ -96,14 +91,13 @@ const UserOnTheRidePanel = ({
               extraParentContainerClass="ring-1 ring-slate-400 mt-1"
               contentExtraClasses="text-slate-600"
               contentBigger={true}
-              />
-        }
+                    />}
 
       </div>
       <div
       className='absolute bottom-4 w-screen flex flex-col items-center gap-y-4'>
         <PanelButton 
-        buttonName={chatButtonName}
+        buttonName="Chat With User"
         disabled={isCancellingRide || error}
         onClick={chatHandler} 
         />
@@ -119,4 +113,4 @@ const UserOnTheRidePanel = ({
   )
 }
 
-export default UserOnTheRidePanel
+export default GoingToUserPanel

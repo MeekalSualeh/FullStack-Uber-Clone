@@ -13,8 +13,8 @@ const CaptainSignup = () => {
     password: '',
     type: '',
     color: '',
-    numberPlate: '',
-    capacity: ''
+    plate: '',
+    capacity: 0
   })
 
   const [error, setError] = useState("")
@@ -32,7 +32,9 @@ const CaptainSignup = () => {
   }
 
   const inputHandler = (e) =>{
-    setUser({...user, [e.target.name]: e.target.value})
+    if(e.target.name === "capacity") setUser({...user, [e.target.name]: parseInt(e.target.value)})
+    
+    else setUser({...user, [e.target.name]: e.target.value})
   }
 
   const submitHandler = async (e) =>{
@@ -49,8 +51,8 @@ const CaptainSignup = () => {
       password: '',
       type: '',
       color: '',
-      numberPlate: '',
-      capacity: ''
+      plate: '',
+      capacity: 0
       })
 
       authData.setIsLoggedin(true);
@@ -174,10 +176,10 @@ const CaptainSignup = () => {
 
               <input 
               type="text" 
-              name='numberPlate'
+              name='plate'
               className='w-3/5 outline-none bg-[#eeeeee] px-3 py-3 placeholder:text-base font-medium focus:ring-2 focus:ring-blue-400 rounded-md transition-border duration-200 ease-out'
               placeholder='i.e: abc-123'
-              value={user.numberPlate}
+              value={user.plate}
               onChange={inputHandler}
               />
             </div>
@@ -188,7 +190,7 @@ const CaptainSignup = () => {
               </label>
 
               <input 
-              type="text" 
+              type="number" 
               name='capacity'
               className='w-3/5 outline-none bg-[#eeeeee] px-3 py-3 placeholder:text-base font-medium focus:ring-2 focus:ring-blue-400 rounded-md transition-border duration-200 ease-out'
               placeholder='i.e: 2'
@@ -204,8 +206,8 @@ const CaptainSignup = () => {
 
           <button
           type='submit'
-          disabled={!user.firstname || !user.lastname || !user.email || !user.password || !user.type || !user.color || !user.numberPlate || !user.capacity || isSubmitting}
-          className={`bg-orange-500 text-white font-semibold text-xl py-3 mt-6 rounded-sm outline-none focus:ring-2 focus:ring-blue-400 ${ (!user.firstname || !user.lastname || !user.email || !user.password || !user.type || !user.color || !user.numberPlate || !user.capacity || isSubmitting) ? "cursor-not-allowed opacity-50": "cursor-pointer"}`}
+          disabled={!user.firstname || !user.lastname || !user.email || !user.password || !user.type || !user.color || !user.plate || !user.capacity || isSubmitting}
+          className={`bg-orange-500 text-white font-semibold text-xl py-3 mt-6 rounded-sm outline-none focus:ring-2 focus:ring-blue-400 ${ (!user.firstname || !user.lastname || !user.email || !user.password || !user.type || !user.color || !user.plate || !user.capacity || isSubmitting) ? "cursor-not-allowed opacity-50": "cursor-pointer"}`}
           > {isSubmitting? "Creating Account..." : "Create Account"}
           </button>
 

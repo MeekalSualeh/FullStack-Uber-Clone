@@ -227,60 +227,6 @@ const UserHomepage = () => {
         <UserWaitingForDriverPanel
         cancelRideHandler={onRideCancelledByUser}
         onGoBack={() =>{
-          setIsVehiclePanelInView(true)
-          setActivePanel("vehicle")
-        }}
-        chatHandler={()=>{
-          setIsChatPanelInView(true)
-          setActivePanel("chat")
-        }}
-        />
-
-        </Panel>
-      ))}
-
-
-      {/* Waiting For Driver Panel */}
-      {(isWaitingForDriverPanelInView && (
-        <Panel 
-        isActive={activePanel === "waitingForDriver"}  
-        heading="Waiting For Driver"
-        isMinimized = {activePanel === "minimizedWaitingForDriver"}
-        onInActive={() => setIsWaitingForDriverPanelInView(false) }
-        onPanelMinimize={() => setActivePanel("minimizedWaitingForDriver") }
-        onPanelMaximize={() => setActivePanel("waitingForDriver") }
-        >
-
-        <UserWaitingForDriverPanel
-        cancelRideHandler={onRideCancelledByUser}
-        onGoBack={() =>{
-          setIsVehiclePanelInView(true)
-          setActivePanel("vehicle")
-        }}
-        chatHandler={()=>{
-          setIsChatPanelInView(true)
-          setActivePanel("chat")
-        }}
-        />
-
-        </Panel>
-      ))}
-
-
-      {/* Waiting For Driver Panel */}
-      {(isWaitingForDriverPanelInView && (
-        <Panel 
-        isActive={activePanel === "waitingForDriver"}  
-        heading="Waiting For Driver"
-        isMinimized = {activePanel === "minimizedWaitingForDriver"}
-        onInActive={() => setIsWaitingForDriverPanelInView(false) }
-        onPanelMinimize={() => setActivePanel("minimizedWaitingForDriver") }
-        onPanelMaximize={() => setActivePanel("waitingForDriver") }
-        >
-
-        <UserWaitingForDriverPanel
-        cancelRideHandler={onRideCancelledByUser}
-        onGoBack={() =>{
           setIsSearchPanelInView(true)
           setActivePanel("minimizedSearch")
         }}
@@ -326,7 +272,7 @@ const UserHomepage = () => {
         <Panel 
         isActive={activePanel === "rideCompleted"}  
         heading="Ride Completion"
-        onInActive={() => setIsOnTheRidePanelInView(false) }
+        onInActive={() => setIsRideCompletedPanelInView(false) }
         >
 
         <UserRideCompletedPanel
@@ -377,7 +323,7 @@ const UserHomepage = () => {
             setIsWaitingForDriverPanelInView(true)
             setActivePanel("waitingForDriver")
             
-          } else {
+          } else if (rideData.status === "on-the-ride"){
             setIsOnTheRidePanelInView(true)
             setActivePanel("onTheRide")
           }

@@ -5,6 +5,7 @@ import { userSignup } from "../api/signup.api"
 import { useAuthContext } from "../contexts/AuthContextProvider"
 
 const UserSignup = () => {
+  
   const [user, setUser] = useState({
     firstname: '',
     lastname: '',
