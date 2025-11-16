@@ -36,7 +36,7 @@ module.exports = (io, socket) =>{
                 }
                 
                 io.to(room).emit("remove-ride", {rideId: room})
-                socket.emit("remove-ride", {rideId: room})
+                socket.emit("finding-driver-cancelled", {rideId: room})
             }
 
             else {

@@ -33,7 +33,7 @@
                 }
             
                 location = response.data.results[0].geometry.location;
-                cache.set(`coordinates:${address}`, location, 180)
+                cache.set(`coordinates:${address}`, location, 600)
         
             } catch (error) {
                 console.log(error)
@@ -75,7 +75,7 @@
                 }
         
                 data = response.data.rows[0].elements[0];
-                cache.set(`timeAndDistance:${origins},${destinations}`, data, 180)
+                cache.set(`timeAndDistance:${origins},${destinations}`, data, 600)
                 
             } catch (error) {
                 console.log(error)
@@ -118,7 +118,7 @@
                 }
         
                 data = response.data.predictions
-                cache.set(`suggestions:${input}`, data, 180)
+                cache.set(`suggestions:${input}`, data, 600)
                 
             } catch (error) {
                 console.log(error);

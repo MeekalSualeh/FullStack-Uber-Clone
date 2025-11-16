@@ -68,11 +68,15 @@ module.exports = (io, socket) =>{
             
             // baki captains se ride remove krna
             io.in(room).except(socket.id).emit("remove-ride", {rideId});
-            io.in(room).except(socket.id).socketsLeave();
+
+            // extra captains ko room se remove karna
+            io.in(room).except(socket.id).socketsLeave(room);
+            
+            // user ko room m join karwana
             io.sockets.sockets.get(userSocketId)?.join(room)
             
             // user and captain ko ride accept a event bhejna
-            return socket.to(room).emit("ride-accepted", { ride, user, captain })
+            return io.to(room).emit("ride-accepted", { ride, user, captain })
 
         } catch (error) {
             console.log(error)
