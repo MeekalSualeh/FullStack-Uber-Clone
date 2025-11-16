@@ -1,9 +1,11 @@
 import { useState } from "react"
 import PanelButton from "./PanelButton"
 import { RiUser3Fill, RiMapPin2Fill, RiInformation2Fill } from "@remixicon/react"
+import { useSocketContext } from "../contexts/SocketContextProvider"
 
 const RideRequestComponent = ({
-    user,
+    rideId,
+    userName,
     pickup,
     destination,
     distance,
@@ -12,12 +14,20 @@ const RideRequestComponent = ({
     isAcceptingRide,
     setIsAcceptingRide
 }) => {
-
+    
     const [isAcceptingThisRide, setIsAcceptingThisRide] = useState(false)
+    
+    const { socket } = useSocketContext()
+
+    const removeRideRequestHandler = (rideId) => {
+
+        return () => socket.current?.emit("remove-ride", { rideId })
+    }
 
     const onAcceptingRide = () =>{
         setIsAcceptingThisRide(true);
         setIsAcceptingRide(true)
+        socket.current?.emit("accept-ride", { rideId })
     }
 
   return (
@@ -28,7 +38,7 @@ const RideRequestComponent = ({
             <RiUser3Fill size={25}/>
 
             <h2 className="text-black text-xl tracking-tight"
-            >{user}</h2>
+            >{userName}</h2>
         </div>
 
         <div className="flex gap-x-4">
@@ -56,10 +66,10 @@ const RideRequestComponent = ({
                 >Fare: {fare} PKR</h4>
 
                 <h4 className=""
-                >Time: {time} Mins</h4>
+                >Time: {Math.floor(time/60)} Mins</h4>
 
                 <h4 className=""
-                >Distance: {distance} KMs</h4>
+                >Distance: {Math.floor(distance/1000)} KMs</h4>
 
             </div>
 
@@ -79,7 +89,7 @@ const RideRequestComponent = ({
         buttonName="Decline"
         disabled={isAcceptingRide}
         color="bg-red-600"
-        onClick={() =>{}} 
+        onClick={removeRideRequestHandler(rideId)} 
         />
         
         </div>

@@ -81,9 +81,8 @@ const UserFindingDriverPanel = ({
   },[])
 
   const onGoBackHandler = () =>{ //change name and delete console.log
-    
     setCancelledBy("")
-
+    
     onGoBack()
   }
 

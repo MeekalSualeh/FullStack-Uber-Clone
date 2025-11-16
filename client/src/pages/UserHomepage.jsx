@@ -5,7 +5,7 @@ import Panel from "../components/Panel"
 import UserSearchPanel from '../panels/UserSearchPanel'
 import UserVehiclePanel from "../panels/UserVehiclePanel"
 import UserFindingDriverPanel from "../panels/UserFindingDriverPanel"
-import UserWaitingForDriverPanel from "../panels/UserWaitingForDriverPanel" // iskay handler bananay and laganay h
+import UserWaitingForDriverPanel from "../panels/UserWaitingForDriverPanel"
 import UserOnTheRidePanel from "../panels/UserOnTheRidePanel" 
 import UserRideCompletedPanel from "../panels/UserRideCompletedPanel"
 import RideCancelledPanel from "../panels/RideCancelledPanel"
@@ -20,17 +20,17 @@ const UserHomepage = () => {
 
   const [pickup, setPickup] = useState("")
   const [destination, setDestination] = useState("")
-  // const [mainAndSecondaryText, setMainAndSecondaryText] = useState({})
-  const [mainAndSecondaryText, setMainAndSecondaryText] = useState({
-    pickup:{
-      mainText: "UBIT",
-      secondaryText: "Circular Road, University Of Karachi"
-    },
-    destination:{
-      mainText: "Maalik Welfare Organization",
-      secondaryText: "F.B Area, Gulberg Block-12, Karachi, Pakistan"
-    }
-  }) // hardcoded h ise null krna
+  const [mainAndSecondaryText, setMainAndSecondaryText] = useState({})
+  // const [mainAndSecondaryText, setMainAndSecondaryText] = useState({
+  //   pickup:{
+  //     mainText: "UBIT",
+  //     secondaryText: "Circular Road, University Of Karachi"
+  //   },
+  //   destination:{
+  //     mainText: "Maalik Welfare Organization",
+  //     secondaryText: "F.B Area, Gulberg Block-12, Karachi, Pakistan"
+  //   }
+  // }) // hardcoded h ise null krna
   const [focusedOn, setFocusedOn] = useState("")
 
   const [pickupCoordinates, setPickupCoordinates] = useState(null)
@@ -40,21 +40,21 @@ const UserHomepage = () => {
   const [time, setTime] = useState(0) // hardcoded h ise null krna
   const [distance, setDistance] = useState(0) // hardcoded h ise null krna
 
-  const [activePanel, setActivePanel] = useState("rideCompleted") // change it to minimizedSearch
+  const [activePanel, setActivePanel] = useState("minimizedSearch") // change it to minimizedSearch
 
-  const [isSearchPanelInView, setIsSearchPanelInView] = useState(false) // isko true and baki sab ko false krna h
+  const [isSearchPanelInView, setIsSearchPanelInView] = useState(true) // isko true and baki sab ko false krna h
   const [isVehiclePanelInView, setIsVehiclePanelInView] = useState(false)
   const [isFindingDriverPanelInView, setIsFindingDriverPanelInView] = useState(false)
   const [isWaitingForDriverPanelInView, setIsWaitingForDriverPanelInView] = useState(false)
-  const [isOnTheRidePanelInView, setIsOnTheRidePanelInView] = useState(true)
-  const [isRideCompletedPanelInView, setIsRideCompletedPanelInView] = useState(true)
+  const [isOnTheRidePanelInView, setIsOnTheRidePanelInView] = useState(false)
+  const [isRideCompletedPanelInView, setIsRideCompletedPanelInView] = useState(false)
   const [isRideCancelledPanelInView, setIsRideCancelledPanelInView] = useState(false)
   const [isChatPanelInView, setIsChatPanelInView] = useState(false)
 
   // const panelArray = useRef(["minimizedSearch", "search", "vehicle", "findingDriver", "rideTimedOut", "waitingForDriver", "minimizedWaitingForDriver", "onTheRide", "minimizedOnTheRide", "rideCompleted", "rideCancelledByUser", "rideCancelledByCaptain", "chat"])
 
   const {socket} = useSocketContext()
-  const {rideData, cancelledBy, setCancelledBy} = useRideContext()
+  const {rideData, cancelledBy, setCancelledBy, setIsCancellingRide} = useRideContext()
   
   const logoutRef = useRef(null)
 
@@ -73,9 +73,30 @@ const UserHomepage = () => {
     setActivePanel("rideCancelledByCaptain")
   }
 
+  const rideAcceptedSocketHandler = () =>{
+    setIsWaitingForDriverPanelInView(true)
+    setActivePanel("waitingForDriver")
+  }
+
+  const rideStartedSocketHandler = () =>{
+    setIsOnTheRidePanelInView(true)
+    setActivePanel("onTheRide")
+  }
+
+  const rideCompletedSocketHandler = () =>{
+    setIsRideCompletedPanelInView(true)
+    setActivePanel("rideCompleted")
+  }
+
   // Socket Event Hooks
   useErrorSocket()
-  useUserSocket(rideCancelledByUserSocketHandler, rideCancelledByCaptainSocketHandler)
+  useUserSocket(
+    rideCancelledByUserSocketHandler, 
+    rideCancelledByCaptainSocketHandler, 
+    rideAcceptedSocketHandler, 
+    rideStartedSocketHandler, 
+    rideCompletedSocketHandler
+  )
   useChatSocket()
   useCommonSocket()
 
@@ -84,14 +105,14 @@ const UserHomepage = () => {
     cancellationBy = cancelledBy === "cancelledByUser" ? "User" : "Captain"
   }, [cancelledBy])
 
-  useEffect(() =>{ // socket m data anay par values set krnay k liye
+  // useEffect(() =>{ // socket m data anay par values set krnay k liye
 
-    switch(rideData.status){
-      case "" :
+  //   switch(rideData.status){
+  //     case "" :
 
-    }
+  //   }
 
-  }, [rideData])
+  // }, [rideData])
 
 
   return (

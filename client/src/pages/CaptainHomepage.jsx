@@ -8,7 +8,7 @@ import UserRideCompletedPanel from "../panels/UserRideCompletedPanel"
 import RideCancelledPanel from "../panels/RideCancelledPanel"
 import ChatPanel from "../panels/ChatPanel"
 
-import { useChatSocket, useCommonSocket, useErrorSocket, useUserSocket } from "../hooks/SocketHooks"
+import { useCaptainSocket, useChatSocket, useCommonSocket, useErrorSocket, useUserSocket } from "../hooks/SocketHooks"
 import { useRideContext } from '../contexts/RideContextProvider'
 import { useSocketContext } from '../contexts/SocketContextProvider'
 import RideRequestsPanel from '../panels/RideRequestsPanel'
@@ -19,14 +19,14 @@ const CaptainHomepage = () => {
 
   const [rideRequests, setRideRequests] = useState([])
 
-  const [activePanel, setActivePanel] = useState("chat") // change it to minimizedSearch
+  const [activePanel, setActivePanel] = useState("minimizedRideRequests") // change it to minimizedSearch
 
-  const [isRideRequestsPanelInView, setIsRideRequestsPanelInView] = useState(false)
+  const [isRideRequestsPanelInView, setIsRideRequestsPanelInView] = useState(true)
   const [isGoingToUserPanelInView, setIsGoingToUserPanelInView] = useState(false)
   const [isOnTheRidePanelInView, setIsOnTheRidePanelInView] = useState(false)
   const [isRideCompletedPanelInView, setIsRideCompletedPanelInView] = useState(false)
   const [isRideCancelledPanelInView, setIsRideCancelledPanelInView] = useState(false)
-  const [isChatPanelInView, setIsChatPanelInView] = useState(true)
+  const [isChatPanelInView, setIsChatPanelInView] = useState(false)
 
   // const panelArray = useRef(["minimizedRideRequests", "rideRequests", "goingToUser", "minimizedGoingToUser", "onTheRide", "minimizedOnTheRide", "rideCompleted", "rideCancelledByUser", "rideCancelledByCaptain", "chat"])
 
@@ -35,7 +35,7 @@ const CaptainHomepage = () => {
   
   const logoutRef = useRef(null)
 
-  const onRideCancelledByUser = () =>{
+  const onRideCancelledByCaptain = () =>{
     setIsCancellingRide(true)
     socket.current?.emit("cancelled-by-captain", {rideId: rideData._id})
   }
@@ -50,25 +50,49 @@ const CaptainHomepage = () => {
     setActivePanel("rideCancelledByCaptain")
   }
 
+  const rideAcceptedSocketHandler = () =>{
+    setIsGoingToUserPanelInView(true)
+    setActivePanel("goingToUser")
+  }
+
+  const rideStartedSocketHandler = () =>{
+    setIsOnTheRidePanelInView(true)
+    setActivePanel("onTheRide")
+  }
+
+  const rideCompletedSocketHandler = () =>{
+    setIsRideCompletedPanelInView(true)
+    setActivePanel("rideCompleted")
+  }
+
   // Socket Event Hooks
   useErrorSocket()
-  useUserSocket(rideCancelledByUserSocketHandler, rideCancelledByCaptainSocketHandler)
+  useCaptainSocket(
+    setRideRequests,
+    rideCancelledByUserSocketHandler, 
+    rideCancelledByCaptainSocketHandler, 
+    rideAcceptedSocketHandler, 
+    rideStartedSocketHandler, 
+    rideCompletedSocketHandler
+  )
   useChatSocket()
   useCommonSocket()
+
+  // ride accepter and decliner banana h. ride timeout pr ride ka hatna check krna h
 
   let cancellationBy;
   useEffect(() =>{
     cancellationBy = cancelledBy === "cancelledByUser" ? "User" : "Captain"
   }, [cancelledBy])
 
-  useEffect(() =>{ // socket m data anay par values set krnay k liye
+  // useEffect(() =>{ // socket m data anay par values set krnay k liye
 
-    switch(rideData.status){
-      case "" :
+  //   switch(rideData.status){
+  //     case "" :
 
-    }
+  //   }
 
-  }, [rideData])
+  // }, [rideData])
 
 
   return (
@@ -100,7 +124,7 @@ const CaptainHomepage = () => {
 
         <RideRequestsPanel
         rideRequests={rideRequests}
-        cancelRideHandler={onRideCancelledByUser}
+        cancelRideHandler={onRideCancelledByCaptain}
         />
 
         </Panel>
@@ -119,7 +143,7 @@ const CaptainHomepage = () => {
         >
 
         <GoingToUserPanel
-        cancelRideHandler={onRideCancelledByUser}
+        cancelRideHandler={onRideCancelledByCaptain}
         onGoBack={() =>{
           setIsRideRequestsPanelInView(true)
           setActivePanel("minimizedRideRequests")
@@ -148,7 +172,7 @@ const CaptainHomepage = () => {
         <UserOnTheRidePanel
         chatButtonName="Chat with User"
         heading="Have a safe journey"
-        cancelRideHandler={onRideCancelledByUser}
+        cancelRideHandler={onRideCancelledByCaptain}
         onGoBack={() =>{
           setRideRequests(true)
           setActivePanel("minimizedRideRequests")
@@ -217,8 +241,8 @@ const CaptainHomepage = () => {
         }}
         onPanelClose={() =>{
           if(rideData.status === "accepted"){
-            setIsWaitingForDriverPanelInView(true)
-            setActivePanel("waitingForDriver")
+            setIsGoingToUserPanelInView(true)
+            setActivePanel("goingToUser")
             
           } else {
             setIsOnTheRidePanelInView(true)
@@ -236,3 +260,6 @@ const CaptainHomepage = () => {
 }
 
 export default CaptainHomepage
+
+// 67.068105 lng
+// 24.944897 lat

@@ -57,7 +57,7 @@ const useUserSocket = (
     const {setUserData} = useUserContext()
     const {setCaptainData} = useCaptainContext()
     const {} = useChatContext()
-    const { setRideData, setCancelledBy, setIsCancellingRide } = useRideContext()
+    const { setRideData, setCancelledBy, isCancellingRide, setIsCancellingRide } = useRideContext()
 
     useEffect(() =>{
         if(!socket?.current) return
@@ -73,6 +73,12 @@ const useUserSocket = (
             setIsCancellingRide(false)
         }
         
+        const findingDriverCancelledHandler = ({ rideId }) =>{
+            setRideData(null)
+            setCancelledBy("cancelledFindingDriver")
+            setIsCancellingRide(false)
+        }
+
         const cancelledByUserHandler = ({ rideId }) =>{
             setRideData(null)
             setCancelledBy("cancelledByUser")
@@ -100,24 +106,26 @@ const useUserSocket = (
         }
         
         const rideCompletedHandler = ({ rideId }) =>{
-            setRideData(prev => ({...prev, status:"completed"}))
+            setRideData(null)
             rideCompletedSocketHandler()
         }
 
 
+        socket.current?.on("ride-timeout", rideTimeoutHandler)
+        socket.current?.on("finding-driver-cancelled", findingDriverCancelledHandler)
         socket.current?.on("cancelled-by-user", cancelledByUserHandler)
         socket.current?.on("cancelled-by-captain", cancelledByCaptainHandler)
         socket.current?.on("remove-ride", removeRideHandler)
-        socket.current?.on("ride-timeout", rideTimeoutHandler)
         socket.current?.on("ride-accepted", rideAcceptedHandler)
         socket.current?.on("ride-started", rideStartedHandler)
         socket.current?.on("ride-completed", rideCompletedHandler)
         
         return () =>{
+            socket.current.off("ride-timeout", rideTimeoutHandler)
+            socket.current.off("finding-driver-cancelled", findingDriverCancelledHandler)
             socket.current.off("cancelled-by-user", cancelledByUserHandler)
             socket.current.off("cancelled-by-captain", cancelledByCaptainHandler)
             socket.current.off("remove-ride", removeRideHandler)
-            socket.current.off("ride-timeout", rideTimeoutHandler)
             socket.current.off("ride-accepted", rideAcceptedHandler)
             socket.current.off("ride-started", rideStartedHandler)
             socket.current.off("ride-completed", rideCompletedHandler)
@@ -127,9 +135,113 @@ const useUserSocket = (
     
 }
 
-const useCaptainSocket = () => {
+const useCaptainSocket = (
+    setRideRequests,
+    rideCancelledByUserSocketHandler, 
+    rideCancelledByCaptainSocketHandler,
+    rideAcceptedSocketHandler,
+    rideStartedSocketHandler,
+    rideCompletedSocketHandler
+) => {
   
-    
+    const {socket} = useSocketContext()
+    const {setUserData} = useUserContext()
+    const {setCaptainData} = useCaptainContext()
+    const {} = useChatContext()
+    const { setRideData, setCancelledBy, isCancellingRide, setIsCancellingRide } = useRideContext()
+
+    useEffect(() =>{
+        if(!socket?.current) return
+
+        const newRideHandler = ({ ride, user }) =>{
+
+            const {
+                _id,
+                pickup, 
+                destination, 
+                expectedDistance, 
+                expectedTime, 
+                fare
+            } = ride
+
+            setRideRequests((prev) => {
+                return [...prev, {
+                    _id: _id.toString(),
+                    userName: `${user.firstname}  ${user.lastname}`,
+                    pickup: pickup.name,
+                    destination: destination.name,
+                    distance: expectedDistance,
+                    time: expectedTime,
+                    fare
+                }]
+            })
+        }
+
+        const removeRideHandler = ({ rideId }) =>{
+            
+            setRideRequests((rides) =>{
+                const index = rides.findIndex(ride => rideId.toString() === ride._id)
+
+                if(index === -1) return rides;
+
+                const tempRides = [...rides];
+                tempRides.splice(index, 1);
+
+                return tempRides;
+            })
+        }
+        
+        const cancelledByUserHandler = ({ rideId }) =>{
+            setRideData(null)
+            setCancelledBy("cancelledByUser")
+            if(isCancellingRide) setIsCancellingRide(false)
+            rideCancelledByUserSocketHandler()
+        }
+
+        const cancelledByCaptainHandler = ({ rideId }) =>{
+            setRideData(null)
+            setCancelledBy("cancelledByCaptain")
+            if(isCancellingRide) setIsCancellingRide(false)
+            rideCancelledByCaptainSocketHandler()
+        }
+
+        const rideAcceptedHandler = ({ ride, user, captain }) =>{
+            setRideData(ride)
+            setUserData(user)
+            setCaptainData(captain)
+            rideAcceptedSocketHandler()
+        }
+        
+        const rideStartedHandler = ({ rideId }) =>{
+            setRideData(prev => ({...prev, status:"on-the-way"}))
+            rideStartedSocketHandler()
+        }
+        
+        const rideCompletedHandler = ({ rideId }) =>{
+            setRideData(null)
+            rideCompletedSocketHandler()
+        }
+
+
+        socket.current?.on("new-ride", newRideHandler)
+        socket.current?.on("cancelled-by-user", cancelledByUserHandler)
+        socket.current?.on("cancelled-by-captain", cancelledByCaptainHandler)
+        socket.current?.on("remove-ride", removeRideHandler)
+        socket.current?.on("ride-accepted", rideAcceptedHandler)
+        socket.current?.on("ride-started", rideStartedHandler)
+        socket.current?.on("ride-completed", rideCompletedHandler)
+        
+        return () =>{
+            socket.current.off("new-ride", newRideHandler)
+            socket.current.off("cancelled-by-user", cancelledByUserHandler)
+            socket.current.off("cancelled-by-captain", cancelledByCaptainHandler)
+            socket.current.off("remove-ride", removeRideHandler)
+            socket.current.off("ride-accepted", rideAcceptedHandler)
+            socket.current.off("ride-started", rideStartedHandler)
+            socket.current.off("ride-completed", rideCompletedHandler)
+        }
+
+    }, [socket.current])
 }
 
 const useCommonSocket = () => {
