@@ -2,7 +2,7 @@ const rateLimit = require("express-rate-limit")
 
 const mapRateLimiter = rateLimit({
     windowMs: 60000,
-    max: 20,
+    max: 50,
     message: { error: "Too many map requests, Slow down" }
 })
 

@@ -44,7 +44,20 @@ module.exports = (io, socket) =>{
             ride.vehicle = captain.vehicle
             await ride.save()
             
-            await chatModel.findOneAndUpdate({ride: rideId}, {$push: { participants: { participant: socket.userId, participantModel: "captain"} }})
+            await chatModel.create({
+                ride:ride._id,
+                messages:[],
+                participants:[
+                    {
+                        participant: ride.user,
+                        participantModel:"user"
+                    },
+                    {
+                        participant: captain._id,
+                        participantModel:"captain"
+                    }
+                ]
+            })
 
             const user = await userModel.findByIdAndUpdate(ride.user, { status: "on-ride" }, { new: true })
 
