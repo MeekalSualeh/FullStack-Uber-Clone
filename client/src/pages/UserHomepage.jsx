@@ -14,6 +14,9 @@ import ChatPanel from "../panels/ChatPanel"
 import { useChatSocket, useCommonSocket, useErrorSocket, useUserSocket } from "../hooks/SocketHooks"
 import { useRideContext } from '../contexts/RideContextProvider'
 import { useSocketContext } from '../contexts/SocketContextProvider'
+import { useCaptainContext } from '../contexts/CaptainContextProvider'
+
+// rideCancelledByUser and rideCancelledByCaptain ko esa banana k rideData baad m cancel hun and page panel pehle change hojaye, real time data show krna in goingToUser and on-ride, chat ko realtime banana, login and page refresh par data k hisaab se panel kholay and data consistent rhay
 
 
 const UserHomepage = () => {
@@ -21,16 +24,6 @@ const UserHomepage = () => {
   const [pickup, setPickup] = useState("")
   const [destination, setDestination] = useState("")
   const [mainAndSecondaryText, setMainAndSecondaryText] = useState({})
-  // const [mainAndSecondaryText, setMainAndSecondaryText] = useState({
-  //   pickup:{
-  //     mainText: "UBIT",
-  //     secondaryText: "Circular Road, University Of Karachi"
-  //   },
-  //   destination:{
-  //     mainText: "Maalik Welfare Organization",
-  //     secondaryText: "F.B Area, Gulberg Block-12, Karachi, Pakistan"
-  //   }
-  // }) // hardcoded h ise null krna
   const [focusedOn, setFocusedOn] = useState("")
 
   const [pickupCoordinates, setPickupCoordinates] = useState(null)
@@ -54,7 +47,9 @@ const UserHomepage = () => {
   // const panelArray = useRef(["minimizedSearch", "search", "vehicle", "findingDriver", "rideTimedOut", "waitingForDriver", "minimizedWaitingForDriver", "onTheRide", "minimizedOnTheRide", "rideCompleted", "rideCancelledByUser", "rideCancelledByCaptain", "chat"])
 
   const {socket} = useSocketContext()
-  const {rideData, cancelledBy, setCancelledBy, setIsCancellingRide} = useRideContext()
+  const {rideData, setRideData, cancelledBy, setCancelledBy, setIsCancellingRide} = useRideContext()
+  const { setCaptainData } = useCaptainContext()
+  
   
   const logoutRef = useRef(null)
 
@@ -101,9 +96,8 @@ const UserHomepage = () => {
   useCommonSocket()
 
   let cancellationBy;
-  useEffect(() =>{
-    cancellationBy = cancelledBy === "cancelledByUser" ? "User" : "Captain"
-  }, [cancelledBy])
+
+  cancellationBy = cancelledBy === "cancelledByUser" ? "User" : "Captain"
 
   // useEffect(() =>{ // socket m data anay par values set krnay k liye
 
@@ -293,7 +287,11 @@ const UserHomepage = () => {
         <Panel 
         isActive={activePanel === "rideCompleted"}  
         heading="Ride Completion"
-        onInActive={() => setIsRideCompletedPanelInView(false) }
+        onInActive={() => {
+          setIsRideCompletedPanelInView(false) 
+          setCaptainData(null)
+          setRideData({})
+        }}
         >
 
         <UserRideCompletedPanel
@@ -312,13 +310,13 @@ const UserHomepage = () => {
         <Panel 
         isActive={activePanel === "rideCancelledByUser" || activePanel === "rideCancelledByCaptain"}  
         // isActive={cancellationBy}  
-        heading={`Ride Cancelled By ${cancellationBy || "User"}`} // iski default value hatani h
+        heading={`Cancellation of Ride By ${cancellationBy}`} // iski default value hatani h
         onInActive={() =>{
           setIsRideCancelledPanelInView(false)
         }}>
 
         <RideCancelledPanel
-        rideCancelledBy={cancellationBy || "User"}
+        rideCancelledBy={cancellationBy}
         onGoBack={() =>{
           setCancelledBy("")
           setIsSearchPanelInView(true)
@@ -334,7 +332,7 @@ const UserHomepage = () => {
       {/* Chat Panel */}
       {(isChatPanelInView && (
         <Panel 
-        isActive={activePanel === "chat"}  
+        isActive={activePanel === "chat"}
         heading="Chat With Captain"
         onInActive={() =>{
           setIsChatPanelInView(false)
@@ -344,7 +342,7 @@ const UserHomepage = () => {
             setIsWaitingForDriverPanelInView(true)
             setActivePanel("waitingForDriver")
             
-          } else if (rideData.status === "on-the-ride"){
+          } else if (rideData.status === "on-the-way"){
             setIsOnTheRidePanelInView(true)
             setActivePanel("onTheRide")
           }

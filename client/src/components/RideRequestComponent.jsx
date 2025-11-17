@@ -66,10 +66,10 @@ const RideRequestComponent = ({
                 >Fare: {fare} PKR</h4>
 
                 <h4 className=""
-                >Time: {Math.floor(time/60)} Mins</h4>
+                >Time: {Math.ceil(time/60)} Mins</h4>
 
                 <h4 className=""
-                >Distance: {Math.floor(distance/1000)} KMs</h4>
+                >Distance: {Math.ceil(distance/1000)} KMs</h4>
 
             </div>
 

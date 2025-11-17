@@ -13,6 +13,7 @@ import { useRideContext } from '../contexts/RideContextProvider'
 import { useSocketContext } from '../contexts/SocketContextProvider'
 import RideRequestsPanel from '../panels/RideRequestsPanel'
 import GoingToUserPanel from '../panels/GoingToUserPanel'
+import { useUserContext } from '../contexts/UserContextProvider'
 
 
 const CaptainHomepage = () => {
@@ -31,8 +32,9 @@ const CaptainHomepage = () => {
   // const panelArray = useRef(["minimizedRideRequests", "rideRequests", "goingToUser", "minimizedGoingToUser", "onTheRide", "minimizedOnTheRide", "rideCompleted", "rideCancelledByUser", "rideCancelledByCaptain", "chat"])
 
   const {socket} = useSocketContext()
-  const {rideData, cancelledBy, setCancelledBy, setIsCancellingRide} = useRideContext()
-  
+  const {rideData, setRideData, cancelledBy, setCancelledBy, setIsCancellingRide} = useRideContext()
+  const { setUserData } = useUserContext()
+
   const logoutRef = useRef(null)
 
   const onRideCancelledByCaptain = () =>{
@@ -53,6 +55,7 @@ const CaptainHomepage = () => {
   const rideAcceptedSocketHandler = () =>{
     setIsGoingToUserPanelInView(true)
     setActivePanel("goingToUser")
+    setRideRequests([]);
   }
 
   const rideStartedSocketHandler = () =>{
@@ -81,9 +84,8 @@ const CaptainHomepage = () => {
   // ride accepter and decliner banana h. ride timeout pr ride ka hatna check krna h
 
   let cancellationBy;
-  useEffect(() =>{
-    cancellationBy = cancelledBy === "cancelledByUser" ? "User" : "Captain"
-  }, [cancelledBy])
+
+  cancellationBy = cancelledBy === "cancelledByUser" ? "User" : "Captain"
 
   // useEffect(() =>{ // socket m data anay par values set krnay k liye
 
@@ -117,6 +119,7 @@ const CaptainHomepage = () => {
         isActive={activePanel === "rideRequests"}  
         heading="Ride Requests"
         isMinimized = {activePanel === "minimizedRideRequests"}
+        defaultY="63%"
         onInActive={() => setIsRideRequestsPanelInView(false) }
         onPanelMinimize={() => setActivePanel("minimizedRideRequests") }
         onPanelMaximize={() => setActivePanel("rideRequests") }
@@ -124,7 +127,6 @@ const CaptainHomepage = () => {
 
         <RideRequestsPanel
         rideRequests={rideRequests}
-        cancelRideHandler={onRideCancelledByCaptain}
         />
 
         </Panel>
@@ -151,6 +153,9 @@ const CaptainHomepage = () => {
         chatHandler={()=>{
           setIsChatPanelInView(true)
           setActivePanel("chat")
+        }}
+        rideStartedHandler={()=>{
+          socket?.current?.emit("ride-started", { rideId: rideData._id })
         }}
         />
 
@@ -181,6 +186,9 @@ const CaptainHomepage = () => {
           setIsChatPanelInView(true)
           setActivePanel("chat")
         }}
+        rideCompletedHandler={() =>{
+          socket?.current?.emit("ride-completed", {rideId: rideData._id})
+        }}
         />
 
         </Panel>
@@ -192,7 +200,11 @@ const CaptainHomepage = () => {
         <Panel 
         isActive={activePanel === "rideCompleted"}  
         heading="Ride Completion"
-        onInActive={() => setIsOnTheRidePanelInView(false) }
+        onInActive={() => {
+          setIsOnTheRidePanelInView(false)
+          setRideData({})
+          setUserData(null)
+        }}
         >
 
         <UserRideCompletedPanel
@@ -212,13 +224,13 @@ const CaptainHomepage = () => {
         <Panel 
         isActive={activePanel === "rideCancelledByUser" || activePanel === "rideCancelledByCaptain"}  
         // isActive={cancellationBy}  
-        heading={`Cancellation of Ride By ${cancellationBy || "Captain"}`} // iski default value hatani h
+        heading={`Cancellation of Ride By ${cancellationBy}`} // iski default value hatani h
         onInActive={() =>{
           setIsRideCancelledPanelInView(false)
         }}>
 
         <RideCancelledPanel
-        rideCancelledBy={cancellationBy || "Captain"}
+        rideCancelledBy={cancellationBy}
         onGoBack={() =>{
           setCancelledBy("")
           setIsRideRequestsPanelInView(true)
@@ -244,7 +256,7 @@ const CaptainHomepage = () => {
             setIsGoingToUserPanelInView(true)
             setActivePanel("goingToUser")
             
-          } else {
+          } else if (rideData.status === "on-the-way"){
             setIsOnTheRidePanelInView(true)
             setActivePanel("onTheRide")
           }

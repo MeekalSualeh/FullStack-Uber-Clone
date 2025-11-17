@@ -110,7 +110,7 @@ const UserSearchPanel = ({
         />
 
         <div
-        className='absolute bottom-7 w-screen flex justify-center'>
+        className='absolute bottom-7 w-screen flex justify-center px-4'>
           <PanelButton 
           buttonName={(pickup && destination) ? "Choose a Vehicle" : (!pickup && !destination) ? "Enter Pickup & Destination" : !pickup ? "Enter Pickup" : "Enter Destination"}
           disabled={!pickup || !destination}

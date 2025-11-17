@@ -21,7 +21,7 @@ const RideCancelledPanel = ({
           />
 
           <p className="text-center text-md text-black font-semibold">
-            Due to unforeseen circumstances ride has been cancelled by {rideCancelledBy}. please follow the given instructions
+            Due to unforeseen circumstances Ride has been cancelled by {rideCancelledBy}. please follow the given instructions
           </p>
 
           <h1 className="text-md text-center font-semibold text-black">
@@ -31,7 +31,7 @@ const RideCancelledPanel = ({
       </div>
 
       <div
-      className='absolute bottom-10 w-screen flex flex-col items-center gap-y-4'>
+      className='absolute bottom-10 w-screen flex flex-col items-center gap-y-4 px-4'>
         <PanelButton 
         buttonName="Go Back"
         onClick={onGoBack} 

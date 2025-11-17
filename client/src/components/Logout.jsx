@@ -21,7 +21,9 @@ const Logout = forwardRef((props, ref) => {
         setUserData(null)
         setCaptainData(null)
         setRideData(null)
-        setChatData(null)
+        setChatData({
+          messages:[]
+        })
 
         if(role === "user") navigate("/user-logout")
         else if(role === "captain") navigate("/captain-logout")

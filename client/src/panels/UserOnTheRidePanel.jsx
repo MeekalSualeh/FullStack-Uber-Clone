@@ -9,21 +9,26 @@ import SingleInfo from "../components/SingleInfo"
 import { RiErrorWarningFill, RiMapPin2Fill, RiWalletFill, RiTaxiFill, RiRidingFill } from "@remixicon/react"
 import { useRideContext } from "../contexts/RideContextProvider"
 import { useCaptainContext } from "../contexts/CaptainContextProvider"
+import { useUserContext } from "../contexts/UserContextProvider"
+import { useAuthContext } from "../contexts/AuthContextProvider"
 
 const UserOnTheRidePanel = ({
   heading="Sit tight and enjoy the ride",
   chatButtonName="Chat with Captain",
   onGoBack,
   cancelRideHandler,
-  chatHandler
+  chatHandler,
+  rideCompletedHandler = () =>{}
 }) => {
 
   const [error, setError] = useState(false)
 
   const {rideData, isCancellingRide} = useRideContext()
-  const {pickup, destination, vehicle, expectedDistance: distance, expectedTime: time, fare} = rideData
+  const {pickup, destination, vehicle, expectedDistance: distance, expectedTime: time, fare} = rideData || {}
 
   const { captainData: captain } = useCaptainContext()
+  const { userData } = useUserContext()
+  const { role } = useAuthContext()
 
   return (
     <>
@@ -34,9 +39,9 @@ const UserOnTheRidePanel = ({
         <div className="w-full flex flex-col items-center mb-8">
 
           <AnimatedVehicle
-          imgSrc={vehicle.type === "car" ? carImg : vehicle.type === "moto" ? motoImg : autoImg}
+          imgSrc={vehicle?.type === "car" ? carImg : vehicle?.type === "moto" ? motoImg : autoImg}
           mtClass="mb-5"
-          imgCover={vehicle.type === "car"}
+          imgCover={vehicle?.type === "car"}
           />
   
           <AnimatedTitlePing
@@ -50,7 +55,7 @@ const UserOnTheRidePanel = ({
         <div className="w-full mt-5 flex flex-col gap-y-4 h-[250px] overflow-y-auto no-scrollbar py-1 px-1">
 
           <SingleInfo
-          title={`Captain: Meekal Sualeh`}
+          title={ role === "captain" ? `Captain: ${captain.firstname} ${captain.lastname || ""}` : `User: ${userData.firstname} ${userData.lastname || ""}`}
           IconComponent={RiRidingFill}
           extraParentContainerClass="ring-1 ring-slate-400"
           contentBigger={true}
@@ -58,28 +63,28 @@ const UserOnTheRidePanel = ({
 
           <SingleInfo
           title="Vehicle"
-          content={`Type: ${vehicle.type} | Color: ${vehicle.color} | Plate: ${vehicle.plate}`}
+          content={`Type: ${vehicle?.type} | Color: ${vehicle?.color} | Plate: ${vehicle?.plate}`}
           IconComponent={RiTaxiFill}
           extraParentContainerClass="ring-1 ring-slate-400"
           />
 
           <SingleInfo
-          title={pickup.mainText}
-          content={pickup.secondaryText}
+          title={pickup?.mainText || ""}
+          content={pickup?.secondaryText || ""}
           IconComponent={RiMapPin2Fill}
           extraParentContainerClass="ring-1 ring-slate-400"
           />
 
           <SingleInfo
-          title={destination.mainText}
-          content={destination.secondaryText}
+          title={destination?.mainText || ""}
+          content={destination?.secondaryText || ""}
           IconComponent={RiMapPin2Fill}
           extraParentContainerClass="ring-1 ring-slate-400"
           />
 
           <SingleInfo
-          title={`PKR ${fare}`} //hardcoded price
-          content={`Time To Reach: ${Math.ceil(time/60)} mins, Distance: ${Math.ceil(distance/1000)} Kms`}
+          title={`PKR ${fare || 0}`} //hardcoded price
+          content={`Time To Reach: ${Math.ceil(time/60) || 0} mins, Distance: ${Math.ceil(distance/1000) || 0} Kms`}
           IconComponent={RiWalletFill}
           extraParentContainerClass="ring-1 ring-slate-400"
           />
@@ -100,19 +105,32 @@ const UserOnTheRidePanel = ({
         }
 
       </div>
+
       <div
-      className='absolute bottom-4 w-screen flex flex-col items-center gap-y-4'>
+      className='absolute bottom-4 w-screen flex flex-col items-center gap-y-4 px-4'>
         <PanelButton 
         buttonName={chatButtonName}
         disabled={isCancellingRide || error}
         onClick={chatHandler} 
         />
 
-        <PanelButton 
-        buttonName={error? "Go Back" : isCancellingRide ? "Cancelling Ride . . . " : "Cancel Ride"}
-        disabled={isCancellingRide}
-        onClick={error ? onGoBack : cancelRideHandler} 
-        />
+        <div className="flex gap-x-3 w-full"> 
+
+          <PanelButton 
+          buttonName={error? "Go Back" : isCancellingRide ? "Cancelling Ride . . . " : "Cancel Ride"}
+          disabled={isCancellingRide}
+          onClick={error ? onGoBack : cancelRideHandler} 
+          />
+
+          {role === "captain" && (
+            <PanelButton 
+            buttonName="Finish Ride"
+            disabled={isCancellingRide}
+            onClick={rideCompletedHandler} 
+            />
+          )}
+
+        </div>
       </div>
     
     </>

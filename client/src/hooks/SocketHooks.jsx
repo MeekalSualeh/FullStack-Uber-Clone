@@ -5,6 +5,7 @@ import { useChatContext } from "../contexts/ChatContextProvider"
 import { useRideContext } from "../contexts/RideContextProvider"
 import { useSocketContext } from "../contexts/SocketContextProvider"
 import { useAuthContext } from "../contexts/AuthContextProvider"
+import { flushSync } from "react-dom"
 
 // FRONTEND EMIT EVENTS -------------- 12
 // connection   
@@ -56,7 +57,7 @@ const useUserSocket = (
     const {socket} = useSocketContext()
     const {setUserData} = useUserContext()
     const {setCaptainData} = useCaptainContext()
-    const {} = useChatContext()
+    const { setChatData } = useChatContext()
     const { setRideData, setCancelledBy, isCancellingRide, setIsCancellingRide } = useRideContext()
 
     useEffect(() =>{
@@ -80,20 +81,31 @@ const useUserSocket = (
         }
 
         const cancelledByUserHandler = ({ rideId }) =>{
-            setRideData(null)
-            setCancelledBy("cancelledByUser")
+
+            flushSync(() =>{
+                setCancelledBy("cancelledByUser")
+                rideCancelledByUserSocketHandler()
+            })
+            
             setIsCancellingRide(false)
-            rideCancelledByUserSocketHandler()
+            setChatData({ message:[] })
+            setRideData({})
         }
 
         const cancelledByCaptainHandler = ({ rideId }) =>{
-            setRideData(null)
-            setCancelledBy("cancelledByCaptain")
+
+            flushSync(() =>{
+                setCancelledBy("cancelledByCaptain")
+                rideCancelledByCaptainSocketHandler()
+            })
+            
             setIsCancellingRide(false)
-            rideCancelledByCaptainSocketHandler()
+            setChatData({ message:[] })
+            setRideData({})
         }
 
         const rideAcceptedHandler = ({ ride, user, captain }) =>{
+
             setRideData(ride)
             setUserData(user)
             setCaptainData(captain)
@@ -101,12 +113,12 @@ const useUserSocket = (
         }
         
         const rideStartedHandler = ({ rideId }) =>{
+
             setRideData(prev => ({...prev, status:"on-the-way"}))
             rideStartedSocketHandler()
         }
         
         const rideCompletedHandler = ({ rideId }) =>{
-            setRideData(null)
             rideCompletedSocketHandler()
         }
 
@@ -147,7 +159,7 @@ const useCaptainSocket = (
     const {socket} = useSocketContext()
     const {setUserData} = useUserContext()
     const {setCaptainData} = useCaptainContext()
-    const {} = useChatContext()
+    const { setChatData } = useChatContext()
     const { setRideData, setCancelledBy, isCancellingRide, setIsCancellingRide } = useRideContext()
 
     useEffect(() =>{
@@ -192,20 +204,31 @@ const useCaptainSocket = (
         }
         
         const cancelledByUserHandler = ({ rideId }) =>{
-            setRideData(null)
-            setCancelledBy("cancelledByUser")
-            if(isCancellingRide) setIsCancellingRide(false)
-            rideCancelledByUserSocketHandler()
+
+            flushSync(() =>{
+                setCancelledBy("cancelledByUser")
+                rideCancelledByUserSocketHandler()
+            })
+
+            setIsCancellingRide(false)
+            setChatData({ message:[] })
+            setRideData({})
         }
 
         const cancelledByCaptainHandler = ({ rideId }) =>{
-            setRideData(null)
-            setCancelledBy("cancelledByCaptain")
-            if(isCancellingRide) setIsCancellingRide(false)
-            rideCancelledByCaptainSocketHandler()
+            
+            flushSync(() =>{
+                setCancelledBy("cancelledByCaptain")
+                rideCancelledByCaptainSocketHandler()
+            })
+
+            setIsCancellingRide(false)
+            setChatData({ message:[] })
+            setRideData({})
         }
 
         const rideAcceptedHandler = ({ ride, user, captain }) =>{
+
             setRideData(ride)
             setUserData(user)
             setCaptainData(captain)
@@ -213,12 +236,12 @@ const useCaptainSocket = (
         }
         
         const rideStartedHandler = ({ rideId }) =>{
+
             setRideData(prev => ({...prev, status:"on-the-way"}))
             rideStartedSocketHandler()
         }
         
         const rideCompletedHandler = ({ rideId }) =>{
-            setRideData(null)
             rideCompletedSocketHandler()
         }
 
@@ -279,10 +302,11 @@ const useChatSocket = () => {
 
         const chatsHandler = ({chats}) =>{
             setChatData(chats)
+            console.log("all chats: ", chats)
         }
 
         const messageHandler = ({message}) =>{
-            setChatData(prev => [...prev, message])
+            setChatData(prev => ({...prev, messages:[...(prev?.messages || []), message]} ) )
         }
 
         socket.current?.on("chats", chatsHandler)

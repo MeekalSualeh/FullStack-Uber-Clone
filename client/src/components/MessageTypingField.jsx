@@ -19,7 +19,7 @@ const MessageTypingField = ({
     
         <button 
         className={`absolute right-3 h-15 w-13 flex justify-center items-center rounded-r-lg text-white ${isLoading ? "bg-slate-400" : "bg-slate-800 cursor-not-allowed"}`}
-        onClick={sendMessageHandler}
+        onClick={() =>{ if(value) sendMessageHandler(value) }}
         >
             <RiSendPlaneFill />
         </button>

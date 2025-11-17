@@ -102,7 +102,7 @@ const UserVehiclePanel = ({
         </div>
 
         <div
-        className='absolute bottom-10 w-screen flex justify-center'>
+        className='absolute bottom-10 w-screen flex justify-center px-4'>
           <PanelButton 
           buttonName={vehicleType ? "Find A Driver" : "Choose Vehicle"}
           disabled={!vehicleType || isLoading}

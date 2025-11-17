@@ -151,7 +151,7 @@ const UserFindingDriverPanel = ({
         </div>
 
         <div
-        className='absolute bottom-10 w-screen flex justify-center'>
+        className='absolute bottom-7 w-screen flex justify-center px-4'>
           <PanelButton
           disabled={isLoading || isCancellingRide}
           buttonName={isLoading ? "Creating Ride . . ." : ( error || cancelReason ) ? "Go Back": isCancellingRide ? "Cancelling Ride . . ." : "Cancel Finding Driver"}

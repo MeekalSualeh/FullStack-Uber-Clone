@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useCaptainContext } from "../contexts/CaptainContextProvider"
+import { useUserContext } from "../contexts/UserContextProvider"
+import { useAuthContext } from "../contexts/AuthContextProvider"
 import { useRideContext } from "../contexts/RideContextProvider"
 import { useChatContext } from "../contexts/ChatContextProvider"
 import { useSocketContext } from "../contexts/SocketContextProvider"
@@ -12,16 +14,18 @@ const ChatPanel = () => {
   const [message, setMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
+  const { role } = useAuthContext()
+  const { userData } = useUserContext()
   const { captainData } = useCaptainContext()
   const { socket } = useSocketContext()
   const { chatData } = useChatContext()
   const { rideData } = useRideContext()
 
   const sendMessageHandler = useCallback((content) =>{
-    // socket?.current?.emit("message-from-frontend", {content, rideId: rideData._id})
+    socket?.current?.emit("message-from-frontend", {content, rideId: rideData._id.toString()})
 
     setMessage("")
-  },[socket.current])
+  },[socket?.current])
 
   const chatRef = useRef(null)
 
@@ -31,13 +35,15 @@ const ChatPanel = () => {
 
     chatRef.current.scrollTop = chatRef.current.scrollHeight
 
-  }, [chatRef.current, chatData.messages, chatData])
+  }, [chatRef?.current, chatData?.messages, chatData])
 
   return (
     <>
 
     <h1 className="mx-7 mt-1 text-xl font-semibold text-orange-600">
-      {captainData?.firstName || "Meekal"} {captainData?.lastName || "Sualeh"}
+
+      {role === "user"?  `${captainData?.firstname} ${captainData?.lastname || ""}` : `${userData?.firstname} ${userData?.lastName || ""}`} 
+
     </h1>
 
     {isLoading && <div className="text-center text-xl font-semibold mt-25"
@@ -48,7 +54,7 @@ const ChatPanel = () => {
     ref={chatRef}
     className="mx-3 pb-4 h-[460px] flex flex-col flex-shrink-0 mt-4 gap-y-6 overflow-y-auto overflow-x-hidden no-scrollbar">
 
-      {chatData.messages.map( ({ 
+      {chatData?.messages?.map(({ 
         _id, 
       author, 
       content, 
@@ -59,7 +65,7 @@ const ChatPanel = () => {
         key={_id}
         content={content}
         createdAt={createdAt}
-        isItMyMessage={author === "123" ? true : false}
+        isItMyMessage={role === "user" ? author === userData._id : author === captainData._id}
         />
 
       ) )}
