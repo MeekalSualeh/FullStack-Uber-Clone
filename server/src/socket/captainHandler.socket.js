@@ -18,7 +18,7 @@ module.exports = (io, socket) =>{
             await captainModel.findByIdAndUpdate(socket.userId, { "location.coordinates": coordinates })
 
             if(rideId){
-                socket.to(socket.rideId.toString()).emit("update-location", {coordinates})
+                io.to(socket.rideId.toString()).emit("update-location", {coordinates})
             }
 
         } catch (error) {
