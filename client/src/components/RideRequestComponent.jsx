@@ -33,30 +33,36 @@ const RideRequestComponent = ({
   return (
     <div className="w-full px-4 py-4 flex flex-col bg-gray-300 border-1 border-slate-400 rounded-xl box-border font-[helvetica] gap-y-2 font-semibold">
 
-        <div className="flex gap-x-4">
+        <div className="flex gap-x-4 w-full box-border">
 
-            <RiUser3Fill size={25}/>
+            <RiUser3Fill/>
 
             <h2 className="text-black text-xl tracking-tight"
             >{userName}</h2>
         </div>
 
-        <div className="flex gap-x-4">
-            <RiMapPin2Fill size={24}/>
+        <div className="flex gap-x-4 w-full box-border">
+
+            <div className="w-10">
+                <RiMapPin2Fill />
+            </div>
 
             <h3 className="text-lg text-slate-800"
             >{pickup}</h3>
         </div>
 
-        <div className="flex gap-x-4">
-            <RiMapPin2Fill size={24}/>            
+        <div className="flex gap-x-4 w-full box-border">
+
+            <div className="w-10">
+                <RiMapPin2Fill />            
+            </div>
             
             <h3 className="text-lg text-slate-800"
             >{destination}</h3>
         </div>
 
 
-        <div className="flex gap-x-4">
+        <div className="flex gap-x-4 w-full box-border">
 
             <RiInformation2Fill size={24}/>
 

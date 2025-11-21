@@ -15,6 +15,8 @@ import { useChatSocket, useCommonSocket, useErrorSocket, useUserSocket } from ".
 import { useRideContext } from '../contexts/RideContextProvider'
 import { useSocketContext } from '../contexts/SocketContextProvider'
 import { useCaptainContext } from '../contexts/CaptainContextProvider'
+import { LoadScript } from '@react-google-maps/api'
+import LiveMap from '../components/LiveMap'
 
 // rideCancelledByUser and rideCancelledByCaptain ko esa banana k rideData baad m cancel hun and page panel pehle change hojaye, real time data show krna in goingToUser and on-ride, chat ko realtime banana, login and page refresh par data k hisaab se panel kholay and data consistent rhay
 
@@ -48,8 +50,7 @@ const UserHomepage = () => {
 
   const {socket} = useSocketContext()
   const {rideData, setRideData, cancelledBy, setCancelledBy, setIsCancellingRide} = useRideContext()
-  const { setCaptainData } = useCaptainContext()
-  
+  const { setCaptainData, captainLocation } = useCaptainContext()
   
   const logoutRef = useRef(null)
 
@@ -111,7 +112,7 @@ const UserHomepage = () => {
 
   return (
     <div className='flex flex-col h-screen w-screen text-[helvetica] relative overflow-hidden'>
-      <div className='absolute mt-5 left-5 right-5 flex justify-between items-center'>
+      <div className='absolute mt-5 left-5 right-5 flex justify-between items-center z-[1]'>
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Uber_logo_2018.png/960px-Uber_logo_2018.png"
         alt="Uber-logo" 
         className='w-18 h-fit'/>
@@ -119,10 +120,53 @@ const UserHomepage = () => {
         <Logout ref={logoutRef} />
       </div>
 
-      <div className='h-112'>
-        <img src="https://miro.medium.com/v2/resize:fit:720/format:webp/0*gwMx05pqII5hbfmX.gif" alt="uber-map" 
-        className='h-full'/>
-      </div>
+    
+  
+      <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
+
+      {(rideData?.status && rideData.status === "accepted") && (
+
+        <LiveMap 
+          pickupCoordinates={{
+            lat: rideData.pickup.coordinates[1],
+            lng: rideData.pickup.coordinates[0]
+          }}
+          showPickup
+          captainLocation={{
+            lat: captainLocation[1],
+            lng: captainLocation[0]
+          }}
+          showCaptain
+          height="h-112"
+        />
+      )}
+
+      {(rideData?.status && rideData.status === "on-the-way") && (
+        
+        <LiveMap 
+          destinationCoordinates={{
+            lat: rideData.destination.coordinates[1],
+            lng: rideData.destination.coordinates[0]
+          }}
+          showDestination
+          captainLocation={{
+            lat: captainLocation[1],
+            lng: captainLocation[0]
+          }}
+          showCaptain
+          height="h-112"
+        />
+      )}
+
+      {(!rideData?.status || !["accepted", "on-the-way"].includes(rideData.status)) && (
+
+        <div className='h-112'>
+          <img src="https://miro.medium.com/v2/resize:fit:720/format:webp/0*gwMx05pqII5hbfmX.gif" alt="uber-map" 
+          className='h-full'/>
+        </div>
+      )}
+
+      </LoadScript>
 
 
       {/* Search Panel */}

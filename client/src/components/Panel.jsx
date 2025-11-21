@@ -70,7 +70,7 @@ const Panel = ({
   return (
     <div
       ref={panelRef} 
-      className='h-full flex flex-col w-screen absolute bottom-0 bg-white rounded-t-4xl transform'
+      className='h-full flex flex-col w-screen absolute bottom-0 bg-white rounded-t-4xl transform z-[500]'
       style={{transform: `translateY(${defaultY})`}}>
 
         <div

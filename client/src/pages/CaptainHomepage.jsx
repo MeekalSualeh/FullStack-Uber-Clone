@@ -7,14 +7,24 @@ import UserOnTheRidePanel from "../panels/UserOnTheRidePanel"
 import UserRideCompletedPanel from "../panels/UserRideCompletedPanel"
 import RideCancelledPanel from "../panels/RideCancelledPanel"
 import ChatPanel from "../panels/ChatPanel"
-
-import { useCaptainSocket, useChatSocket, useCommonSocket, useErrorSocket, useUserSocket } from "../hooks/SocketHooks"
-import { useRideContext } from '../contexts/RideContextProvider'
-import { useSocketContext } from '../contexts/SocketContextProvider'
 import RideRequestsPanel from '../panels/RideRequestsPanel'
 import GoingToUserPanel from '../panels/GoingToUserPanel'
-import { useUserContext } from '../contexts/UserContextProvider'
 
+import { useRideContext } from '../contexts/RideContextProvider'
+import { useSocketContext } from '../contexts/SocketContextProvider'
+import { useUserContext } from '../contexts/UserContextProvider'
+import { useCaptainContext } from '../contexts/CaptainContextProvider'
+import {
+  useCaptainSocket,
+  useChatSocket,
+  useCommonSocket,
+  useErrorSocket,
+  useUserSocket
+} from "../hooks/SocketHooks"
+
+import LiveMap from '../components/LiveMap'
+import { LocationHook } from '../hooks/LocationHook'
+import { LoadScript } from '@react-google-maps/api'
 
 const CaptainHomepage = () => {
 
@@ -31,15 +41,16 @@ const CaptainHomepage = () => {
 
   // const panelArray = useRef(["minimizedRideRequests", "rideRequests", "goingToUser", "minimizedGoingToUser", "onTheRide", "minimizedOnTheRide", "rideCompleted", "rideCancelledByUser", "rideCancelledByCaptain", "chat"])
 
-  const {socket} = useSocketContext()
-  const {rideData, setRideData, cancelledBy, setCancelledBy, setIsCancellingRide} = useRideContext()
+  const { socket} = useSocketContext()
+  const { rideData, setRideData, cancelledBy, setCancelledBy, setIsCancellingRide} = useRideContext()
   const { setUserData } = useUserContext()
+  const { captainLocation } = useCaptainContext()
 
   const logoutRef = useRef(null)
 
   const onRideCancelledByCaptain = () =>{
     setIsCancellingRide(true)
-    socket.current?.emit("cancelled-by-captain", {rideId: rideData._id})
+    socket.current?.emit("cancelled-by-captain", {rideId: rideData?._id})
   }
 
   const rideCancelledByUserSocketHandler = () =>{
@@ -81,7 +92,8 @@ const CaptainHomepage = () => {
   useChatSocket()
   useCommonSocket()
 
-  // ride accepter and decliner banana h. ride timeout pr ride ka hatna check krna h
+  // hooks to send coordinates of captain to backend
+  LocationHook()
 
   let cancellationBy;
 
@@ -98,8 +110,12 @@ const CaptainHomepage = () => {
 
 
   return (
-    <div className='flex flex-col h-screen w-screen text-[helvetica] relative overflow-hidden'>
-      <div className='absolute mt-5 left-5 right-5 flex justify-between items-center'>
+    <div 
+    className='flex flex-col h-screen w-screen text-[helvetica] relative overflow-hidden'>
+
+      <div 
+      className={`absolute mt-5 left-5 right-5 flex justify-between items-center z-[500] !rideData?.status || !["accepted", "on-the-way"].includes(rideData.status) `}>
+
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Uber_logo_2018.png/960px-Uber_logo_2018.png"
         alt="Uber-logo" 
         className='w-18 h-fit'/>
@@ -107,10 +123,51 @@ const CaptainHomepage = () => {
         <Logout ref={logoutRef} />
       </div>
 
-      <div className='h-112'>
-        <img src="https://miro.medium.com/v2/resize:fit:720/format:webp/0*gwMx05pqII5hbfmX.gif" alt="uber-map" 
-        className='h-full'/>
-      </div>
+      <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
+
+      {(rideData?.status && rideData.status === "accepted") && (
+
+        <LiveMap 
+          pickupCoordinates={{
+            lat: rideData.pickup.coordinates[1],
+            lng: rideData.pickup.coordinates[0]
+          }}
+          showPickup
+          captainLocation={{
+            lat: captainLocation[1],
+            lng: captainLocation[0]
+          }}
+          showCaptain
+          height="h-112"
+        />
+      )}
+
+      {(rideData?.status && rideData.status === "on-the-way") && (
+        
+        <LiveMap 
+          destinationCoordinates={{
+            lat: rideData.destination.coordinates[1],
+            lng: rideData.destination.coordinates[0]
+          }}
+          showDestination
+          captainLocation={{
+            lat: captainLocation[1],
+            lng: captainLocation[0]
+          }}
+          showCaptain
+          height="h-112"
+        />
+      )}
+
+      {(!rideData?.status || !["accepted", "on-the-way"].includes(rideData.status)) && (
+
+        <div className='h-112'>
+          <img src="https://miro.medium.com/v2/resize:fit:720/format:webp/0*gwMx05pqII5hbfmX.gif" alt="uber-map" 
+          className='h-full'/>
+        </div>
+      )}
+
+      </LoadScript>
 
 
       {/* Ride Requests Panel */}
@@ -155,7 +212,7 @@ const CaptainHomepage = () => {
           setActivePanel("chat")
         }}
         rideStartedHandler={()=>{
-          socket?.current?.emit("ride-started", { rideId: rideData._id })
+          socket?.current?.emit("ride-started", { rideId: rideData?._id })
         }}
         />
 
@@ -187,7 +244,7 @@ const CaptainHomepage = () => {
           setActivePanel("chat")
         }}
         rideCompletedHandler={() =>{
-          socket?.current?.emit("ride-completed", {rideId: rideData._id})
+          socket?.current?.emit("ride-completed", {rideId: rideData?._id})
         }}
         />
 

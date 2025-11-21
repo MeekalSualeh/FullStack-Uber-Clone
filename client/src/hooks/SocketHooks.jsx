@@ -64,18 +64,18 @@ const useUserSocket = (
         if(!socket?.current) return
 
         const rideTimeoutHandler = ({ rideId }) =>{
-            setRideData(null)
+            setRideData({})
             setCancelledBy("timedOut")
         }
         
         const removeRideHandler = ({ rideId }) =>{
-            setRideData(null)
+            setRideData({})
             setCancelledBy("cancelledFindingDriver")
             setIsCancellingRide(false)
         }
         
         const findingDriverCancelledHandler = ({ rideId }) =>{
-            setRideData(null)
+            setRideData({})
             setCancelledBy("cancelledFindingDriver")
             setIsCancellingRide(false)
         }
@@ -269,12 +269,8 @@ const useCaptainSocket = (
 
 const useCommonSocket = () => {
   
-    const {socket} = useSocketContext()
-    const {} = useUserContext()
+    const { socket } = useSocketContext()
     const { setCaptainLocation } = useCaptainContext()
-    const {} = useChatContext()
-    const {} = useRideContext()
-    const { role } = useAuthContext()
 
     useEffect(() =>{
         if(!socket?.current) return
@@ -302,7 +298,6 @@ const useChatSocket = () => {
 
         const chatsHandler = ({chats}) =>{
             setChatData(chats)
-            console.log("all chats: ", chats)
         }
 
         const messageHandler = ({message}) =>{

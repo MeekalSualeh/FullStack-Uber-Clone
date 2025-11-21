@@ -20,7 +20,7 @@ const Logout = forwardRef((props, ref) => {
         
         setUserData(null)
         setCaptainData(null)
-        setRideData(null)
+        setRideData({})
         setChatData({
           messages:[]
         })
