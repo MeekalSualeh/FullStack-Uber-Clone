@@ -12,7 +12,8 @@ const socketSetup = (server) =>{
         cors: {
             origin: "https://full-stack-uber-clone-mu.vercel.app",
             credentials: true
-        }
+        },
+        transports: ["polling", "websocket"]
     })   
 
     io.use(socketAuthMiddleware)
