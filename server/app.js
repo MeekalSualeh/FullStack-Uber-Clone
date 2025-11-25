@@ -20,7 +20,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
 app.use(cors({
     origin: "https://full-stack-uber-clone-mu.vercel.app",
-    credentials: true
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"]
 }))
 
 app.use("/user", userRoute);
@@ -29,9 +30,8 @@ app.use("/map", mapRoute);
 app.use("/ride", rideRoute);
 app.use("/auth", authRoute);
 
+app.get("/", ()=>{
+    res.json("Server running")
+})
+
 module.exports = app
-
-// error
-// success
-// redirect
-
