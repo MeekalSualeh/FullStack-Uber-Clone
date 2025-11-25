@@ -10,7 +10,8 @@ let io;
 const socketSetup = (server) =>{
     io = new Server(server, {
         cors: {
-            origin: "https://full-stack-uber-clone-mu.vercel.app",
+            // origin: "https://full-stack-uber-clone-mu.vercel.app",
+            origin: "*",
             methods: ["GET", "POST"],
             credentials: true
         },
