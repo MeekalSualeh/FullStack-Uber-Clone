@@ -14,7 +14,7 @@ const socketSetup = (server) =>{
             methods: ["GET", "POST"],
             credentials: true
         },
-        // transports: ["websocket"],
+        transports: ["websocket"]
         // pingInterval: 10000,
         // pingTimeout: 20000
     })   
