@@ -14,9 +14,9 @@ const socketSetup = (server) =>{
             methods: ["GET", "POST"],
             credentials: true
         },
-        transports: ["polling", "websocket"],
-        pingInterval: 10000,
-        pingTimeout: 20000
+        // transports: ["websocket"],
+        // pingInterval: 10000,
+        // pingTimeout: 20000
     })   
 
     io.use(socketAuthMiddleware)
