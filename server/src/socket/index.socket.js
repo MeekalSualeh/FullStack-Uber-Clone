@@ -10,8 +10,7 @@ let io;
 const socketSetup = (server) =>{
     io = new Server(server, {
         cors: {
-            origin: "http://localhost:5173",
-            // origin: "*",
+            origin: "*",
             credentials: true
         }
     })   
