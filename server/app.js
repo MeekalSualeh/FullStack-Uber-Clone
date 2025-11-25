@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
 app.use(cors({
-    origin: "https://full-stack-uber-clone-mu.vercel.app/",
+    origin: "https://full-stack-uber-clone-mu.vercel.app",
     credentials: true
 }))
 
