@@ -13,6 +13,8 @@ const authenticateUser = async (req, res, next) =>{
     const { accessToken } = req.cookies;
     let user, model;
 
+    console.log("rest access token: ", accessToken)
+
     if(accessToken){
         try {
         const accessTokenData = verifyJWTKey(accessToken)
@@ -52,6 +54,8 @@ const authenticateUser = async (req, res, next) =>{
     }
     
     const { refreshToken } = req.cookies
+
+    console.log("rest refresh token: ", refreshToken)
 
     if(!refreshToken){
         return res.status(401).json({error: "Refresh Token not found", redirect: true})
@@ -119,6 +123,10 @@ const socketAuthMiddleware = async (socket, next) =>{
     const socketCookie = cookie.parse(socket.handshake.headers.cookie || "")
     const accessToken = socketCookie?.accessToken;
     
+    console.log("socket cookie: ", socketCookie)
+    console.log("socket access token: ", accessToken)
+
+
     let data, user, model
     
     try {
@@ -137,6 +145,8 @@ const socketAuthMiddleware = async (socket, next) =>{
         if(!user){
             const refreshToken = socketCookie?.refreshToken
             
+            console.log("socket refresh token", refreshToken)
+
             if(!refreshToken){
                 return next(new Error("Refresh Token not found"))
             }
