@@ -125,6 +125,8 @@ const socketAuthMiddleware = async (socket, next) =>{
     
     console.log("socket cookie: ", socketCookie)
     console.log("socket access token: ", accessToken)
+    console.log("headers: ", socket.handshake.headers);
+    console.log("transport: ", socket.conn.transport.name);
 
 
     let data, user, model
