@@ -10,7 +10,7 @@ let io;
 const socketSetup = (server) =>{
     io = new Server(server, {
         cors: {
-            origin: "https://fullstack-uber-clone-1.onrender.com/",
+            origin: "https://fullstack-uber-clone-1.onrender.com",
             credentials: true
         },
         transports: ["websocket"]
