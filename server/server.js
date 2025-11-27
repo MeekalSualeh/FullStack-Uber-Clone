@@ -6,8 +6,8 @@ const server = createServer(app);
 
 socketSetup(server);
 
-server.listen(process.env.PORT || 3000,  () =>{
-    console.log(`server is running on port: http://localhost:${process.env.PORT || 3000}`)
+server.listen(process.env.PORT,  () =>{
+    console.log(`server is running on port: http://localhost:${process.env.PORT}`)
 })
 
 // transactions m await lagana
