@@ -16,7 +16,7 @@ const { connectToMongo } = require("./src/config/db.config")
 connectToMongo();
 
 // setting to trust proxy
-app.set("trust proxy", true)
+app.set("trust proxy", 1)
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
