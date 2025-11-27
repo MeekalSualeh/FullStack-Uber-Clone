@@ -3,6 +3,7 @@ module.exports.setCookie = (res, cookieName, token, expiryTime) =>{
         httpOnly: true,
         sameSite: "none",
         secure: true,
+        domain: ".onrender.com",
         maxAge: expiryTime
     }
     res.cookie(cookieName, token, options)
@@ -14,6 +15,7 @@ module.exports.removeCookie = (res, cookieName) =>{
         httpOnly: true,
         sameSite: "none",
         secure: true,
+        domain: ".onrender.com",
     }
     res.clearCookie(cookieName, options)
 }
