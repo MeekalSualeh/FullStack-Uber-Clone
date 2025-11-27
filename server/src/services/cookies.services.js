@@ -12,7 +12,7 @@ module.exports.setCookie = (res, cookieName, token, expiryTime) =>{
 module.exports.removeCookie = (res, cookieName) =>{
     const options = {
         httpOnly: true,
-        sameSite: "strict",
+        sameSite: "none",
         secure: true,
     }
     res.clearCookie(cookieName, options)
