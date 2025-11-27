@@ -4,7 +4,7 @@ let socket = null;
 
 const connectSocket = () =>{
     if(!socket){
-        socket = io(import.meta.env.VITE_BACKEND_URL, {
+        socket = io("https://fullstack-uber-clone.onrender.com", {
             withCredentials: true,
             transports: ["websocket"]
         })

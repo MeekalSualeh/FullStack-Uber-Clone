@@ -1,7 +1,7 @@
 module.exports.setCookie = (res, cookieName, token, expiryTime) =>{
     const options = {
         httpOnly: true,
-        sameSite: "strict",
+        sameSite: "none",
         secure: true,
         maxAge: expiryTime
     }
